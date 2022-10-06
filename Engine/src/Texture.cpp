@@ -16,7 +16,12 @@ namespace KenazEngine {
     int Texture::Load(const std::string& fileName) {
 
         //Load image at specified path
-        SDL_Surface* loadedSurface = IMG_Load( fileName.c_str() );
+        std::string filePath;
+        //TODO: get project directory
+        filePath.append(SDL_GetBasePath())
+                .append("../../Game/Textures/")
+                .append(fileName);
+        SDL_Surface* loadedSurface = IMG_Load(filePath.c_str());
         if(!loadedSurface)
         {
             printf( "Unable to load image %s! SDL_image Error: %s\n", fileName.c_str(), IMG_GetError() );
@@ -42,7 +47,7 @@ namespace KenazEngine {
 
     int Texture::Move(int16_t x, int16_t y) {
         Position->first = Position->first + x;
-        Position->second = Position->second + x;
+        Position->second = Position->second + y;
         return 0;
     }
 

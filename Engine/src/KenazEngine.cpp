@@ -19,6 +19,7 @@
 namespace KenazEngine {
     KenazEngine::KenazEngine() {
         Resolution = std::make_shared<std::pair<uint16_t, uint16_t>>(640, 480);
+        Framerate = 60;
     }
 
     #pragma region INITIALIZATION
@@ -64,7 +65,7 @@ namespace KenazEngine {
                                BackgroundColor.r, BackgroundColor.g, BackgroundColor.b,
                                SDL_ALPHA_OPAQUE);
 
-        //Initialize PNG loading
+        //Initialize JPG loading
         if( !( IMG_Init( IMG_INIT_JPG ) & IMG_INIT_JPG ) )
         {
             printf( "SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError() );
@@ -76,38 +77,29 @@ namespace KenazEngine {
                                                                        Resolution->first,
                                                                        Resolution->second,
                                                                        32,
-                                                                       0, 0, 0, 1));
+                                                                       BackgroundColor.r,
+                                                                       BackgroundColor.g,
+                                                                       BackgroundColor.b,
+                                                                       1));
 
         return true;
     }
     #pragma endregion
 
-    int KenazEngine::Update() {
-        SDL_Event event;
-        TestTexture = CreateTexture();
-        TestTexture->Load("/home/masterktos/Player.jpg");
-        TestTexture->MoveTo(15, 15);
-
-        //TODO: move for outside function (to Game.cpp)
-        for (;;) {
-            while (SDL_PollEvent(&event)) {
-                if (event.type == SDL_QUIT) {
-                    SDL_DestroyWindow(Window);
-                    return 0;
-                }
-            }
-
-            SDL_RenderClear(Renderer);
-            SDL_RenderCopy(Renderer, Background, nullptr, nullptr);
-            TestTexture->Show();
-            TestTexture->Move(10, 0);
-            SDL_RenderPresent(Renderer);
-            SDL_Delay(16);
-        }
+    int KenazEngine::UpdateBegin() {
+        SDL_RenderPresent(Renderer);
+        SDL_Delay(1000/Framerate);
+        SDL_RenderClear(Renderer);
+        SDL_RenderCopy(Renderer, Background, nullptr, nullptr);
     }
 
     // Initializes Texture object
     Texture *KenazEngine::CreateTexture() {
         return new Texture(Renderer);
+    }
+
+    int KenazEngine::Quit() {
+        SDL_DestroyWindow(Window);
+        return 0;
     }
 }

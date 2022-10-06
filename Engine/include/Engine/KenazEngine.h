@@ -23,12 +23,12 @@ namespace KenazEngine {
         std::shared_ptr<std::pair<uint16_t, uint16_t>> Resolution;
         Color BackgroundColor;
         std::string Title;
+        uint8_t Framerate;
 
     private:
         SDL_Window* Window;
         SDL_Renderer* Renderer;
         SDL_Texture* Background;
-        Texture* TestTexture;
 
     public:
         explicit KenazEngine();
@@ -39,7 +39,8 @@ namespace KenazEngine {
         bool SetBackgroundColor(int r, int g, int b);
 
         bool Start();
-        int Update();
+        int UpdateBegin();
+        int Quit();
 
         Texture* CreateTexture();
     };
