@@ -7,15 +7,6 @@
 #include <utility>
 #include <iostream>
 
-/*
- * ZAŁOŻENIA:
- * - maksymalnie prosty konstruktor (najlepiej pusty)
- * - ustalanie konkretnych parametrów przez funkcje
- *   - np. KenazEngine.Resolution() etc
- *
- *
- * */
-
 namespace KenazEngine {
     KenazEngine::KenazEngine() {
         Resolution = std::make_shared<std::pair<uint16_t, uint16_t>>(640, 480);

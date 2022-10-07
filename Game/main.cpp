@@ -15,10 +15,15 @@ int main(int argc, char *argv[]) {
     Player->Load("Player.jpg");
     Player->MoveTo(20, 50);
 
+    KenazEngine::Texture* Fren = Kenaz.CreateTexture();
+    Fren->Load("guinea_pig.jpg");
+    Fren->MoveTo(400, 200);
+
     //TODO: change the way events are handled
     SDL_Event event;
 
-    for (;;) {
+    int i = 0;
+    for (;;i++) {
         Kenaz.UpdateBegin();
         //Handle events
         while (SDL_PollEvent(&event)) {
@@ -29,7 +34,19 @@ int main(int argc, char *argv[]) {
 
         //Display stuff
         Player->Show();
-        Player->Move(5, 0);
+        Fren->Show();
+
+        //"Animations"
+        if(i%200 < 100)
+            Player->Move(5, 0);
+        else
+            Player->Move(-5, 0);
+        if(i%400 < 150)
+            Fren->Move(-1, 1);
+        else if(i%400 < 300)
+            Fren->Move(-1, -1);
+        else
+            Fren->Move(3, 0);
     }
 
 

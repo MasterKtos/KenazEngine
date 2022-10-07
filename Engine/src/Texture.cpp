@@ -53,7 +53,7 @@ namespace KenazEngine {
 
     int Texture::MoveTo(int16_t x, int16_t y) {
         Position->first = x;
-        Position->second = x;
+        Position->second = y;
         return 0;
     }
 
