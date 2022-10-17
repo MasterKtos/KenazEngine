@@ -45,6 +45,12 @@ namespace KenazEngine {
         return 0;
     }
 
+    int Texture::Resize(int16_t x, int16_t y) {
+        Size->first = x;
+        Size->second = y;
+        return 0;
+    }
+
     int Texture::Move(int16_t x, int16_t y) {
         Position->first = Position->first + x;
         Position->second = Position->second + y;
@@ -59,7 +65,7 @@ namespace KenazEngine {
 
     int Texture::Show() {
         SDL_RenderCopy( GameRenderer, Image, nullptr,
-                        new SDL_Rect { Position->first, Position->second,
+                        new SDL_Rect { Position->first - Size->first/2, Position->second - Size->second/2,
                                                 Size->first, Size->second });
         return 0;
     }

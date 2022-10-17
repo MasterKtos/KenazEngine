@@ -12,15 +12,21 @@ int main(int argc, char *argv[]) {
     if(!Kenaz.Start()) return 1;
 
     KenazEngine::Texture* Player = Kenaz.CreateTexture();
-    Player->Load("Player.jpg");
-    Player->MoveTo(20, 50);
+    Player->Load("square.png");
+    Player->Resize(64, 64);
+    Player->MoveTo(200, 300);
 
     KenazEngine::Texture* Fren = Kenaz.CreateTexture();
-    Fren->Load("guinea_pig.jpg");
+    Fren->Load("circle.png");
+    Fren->Resize(64, 64);
     Fren->MoveTo(400, 200);
 
     //TODO: change the way events are handled
     SDL_Event event;
+    float playerMoveX;
+    float playerMoveY;
+    float frenPositionX;
+    float frenPositionY;
 
     int i = 0;
     for (;;i++) {
@@ -30,23 +36,38 @@ int main(int argc, char *argv[]) {
             if (event.type == SDL_QUIT) {
                 return Kenaz.Quit();
             }
+            if(event.type == SDL_KEYDOWN) {
+                switch(event.key.keysym.sym) {
+                    case SDLK_UP: playerMoveY = -5; break;
+                    case SDLK_DOWN: playerMoveY = 5; break;
+                    case SDLK_LEFT: playerMoveX = -5; break;
+                    case SDLK_RIGHT: playerMoveX = 5; break;
+                }
+                printf("KEYDOWN | %d \n", event.key.keysym.sym);
+            }
+            if(event.type == SDL_KEYUP) {
+                switch(event.key.keysym.sym) {
+                    case SDLK_UP:
+                    case SDLK_DOWN: playerMoveY = 0; break;
+                    case SDLK_LEFT:
+                    case SDLK_RIGHT: playerMoveX = 0; break;
+                }
+                printf("KEYUP | %d \n", event.key.keysym.sym);
+            }
+            if(event.type == SDL_MOUSEMOTION) {
+                printf("KEYMOTION [ %d | %d ] \n", event.motion.x, event.motion.y);
+                frenPositionX = event.motion.x;
+                frenPositionY = event.motion.y;
+            }
         }
 
         //Display stuff
         Player->Show();
         Fren->Show();
 
-        //"Animations"
-        if(i%200 < 100)
-            Player->Move(5, 0);
-        else
-            Player->Move(-5, 0);
-        if(i%400 < 150)
-            Fren->Move(-1, 1);
-        else if(i%400 < 300)
-            Fren->Move(-1, -1);
-        else
-            Fren->Move(3, 0);
+        //ToDo: add Lerp to one object
+        Player->Move(playerMoveX, playerMoveY);
+        Fren->MoveTo(frenPositionX, frenPositionY);
     }
 
 

@@ -57,7 +57,7 @@ namespace KenazEngine {
                                SDL_ALPHA_OPAQUE);
 
         //Initialize JPG loading
-        if( !( IMG_Init( IMG_INIT_JPG ) & IMG_INIT_JPG ) )
+        if( !( IMG_Init( IMG_INIT_PNG ) & IMG_INIT_PNG ) )
         {
             printf( "SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError() );
             return false;
@@ -72,6 +72,7 @@ namespace KenazEngine {
                                                                        BackgroundColor.g,
                                                                        BackgroundColor.b,
                                                                        1));
+        SDL_ShowCursor(SDL_DISABLE);
 
         return true;
     }

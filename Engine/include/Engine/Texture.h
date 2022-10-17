@@ -26,6 +26,7 @@ namespace KenazEngine {
         int Load(const std::string& fileName);
         int Show();
 
+        int Resize(int16_t x, int16_t y);
         int Move(int16_t x, int16_t y);
         int MoveTo(int16_t x, int16_t y);
     };
