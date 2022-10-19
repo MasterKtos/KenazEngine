@@ -29,6 +29,16 @@ namespace KenazEngine {
         int Resize(int16_t x, int16_t y);
         int Move(int16_t x, int16_t y);
         int MoveTo(int16_t x, int16_t y);
+
+        //for texture copy
+
+        //TODO: replace with something better
+        Texture GetCopy();
+        SDL_Renderer* GetRenderer();
+        SDL_Texture* GetImage();
+        void SetImage(SDL_Texture* image);
+        std::shared_ptr<std::pair<int16_t, int16_t>> GetPosition();
+        std::shared_ptr<std::pair<uint16_t, uint16_t>> GetSize();
     };
 }
 

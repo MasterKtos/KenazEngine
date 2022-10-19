@@ -15,7 +15,7 @@ namespace KenazEngine {
 
     int Texture::Load(const std::string& fileName) {
 
-        //Load image at specified path
+        //LoadMap image at specified path
         std::string filePath;
         //TODO: get project directory
         filePath.append(SDL_GetBasePath())
@@ -68,5 +68,39 @@ namespace KenazEngine {
                         new SDL_Rect { Position->first - Size->first/2, Position->second - Size->second/2,
                                                 Size->first, Size->second });
         return 0;
+    }
+
+    SDL_Renderer *Texture::GetRenderer() {
+        return GameRenderer;
+    }
+
+    SDL_Texture *Texture::GetImage() {
+        return Image;
+    }
+
+    std::shared_ptr<std::pair<int16_t, int16_t>> Texture::GetPosition() {
+        std::shared_ptr<std::pair<int16_t, int16_t>> copyPos;
+        copyPos->first = Position->first;
+        copyPos->second = Position->second;
+        return copyPos;
+    }
+
+    std::shared_ptr<std::pair<uint16_t, uint16_t>> Texture::GetSize() {
+        std::shared_ptr<std::pair<uint16_t, uint16_t>> copySize;
+        copySize->first = Size->first;
+        copySize->second = Size->second;
+        return copySize;
+    }
+
+    Texture Texture::GetCopy() {
+        Texture newTexture = Texture(GameRenderer);
+        newTexture.SetImage(Image);
+        newTexture.MoveTo(Position->first, Position->second);
+        newTexture.Resize(Size->first, Size->second);
+        return newTexture;
+    }
+
+    void Texture::SetImage(SDL_Texture* image) {
+        Image = image;
     }
 }
