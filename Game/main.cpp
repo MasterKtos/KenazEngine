@@ -1,5 +1,5 @@
 #include <iostream>
-#include "SDL2/SDL.h"
+#include "SDL.h"
 #include "Engine/KenazEngine.h"
 #include "Engine/Map.h"
 
@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
     //TODO: change the way events are handled
     SDL_Event event;
 
-    float playerMoveX;https://www.youtube.com/watch?v=rhMYUmbzXKA
+    float playerMoveX;
     float playerMoveY;
 
     float moveRegion = 50;

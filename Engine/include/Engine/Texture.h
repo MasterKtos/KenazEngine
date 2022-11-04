@@ -5,7 +5,7 @@
 #ifndef SDLPROJECT_TEXTURE_H
 #define SDLPROJECT_TEXTURE_H
 
-#include "SDL2/SDL.h"
+#include "SDL.h"
 #include <SDL_image.h>
 #include <string>
 #include <memory>
@@ -29,6 +29,7 @@ namespace KenazEngine {
         int Resize(int16_t x, int16_t y);
         int Move(int16_t x, int16_t y);
         int MoveTo(int16_t x, int16_t y);
+
 
         //for texture copy
 

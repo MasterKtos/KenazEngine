@@ -4,8 +4,9 @@
 #include <memory>
 #include <cstdint>
 #include <utility>
-#include <SDL2/SDL.h>
-#include <SDL_image.h>
+//#include <SDL2/SDL.h>
+//#include <SDL_image.h>
+#include <SDL.h>
 #include <string>
 #include "Texture.h"
 
