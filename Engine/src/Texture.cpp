@@ -79,17 +79,11 @@ namespace KenazEngine {
     }
 
     std::shared_ptr<std::pair<int16_t, int16_t>> Texture::GetPosition() {
-        std::shared_ptr<std::pair<int16_t, int16_t>> copyPos;
-        copyPos->first = Position->first;
-        copyPos->second = Position->second;
-        return copyPos;
+        return Position;
     }
 
     std::shared_ptr<std::pair<uint16_t, uint16_t>> Texture::GetSize() {
-        std::shared_ptr<std::pair<uint16_t, uint16_t>> copySize;
-        copySize->first = Size->first;
-        copySize->second = Size->second;
-        return copySize;
+        return Size;
     }
 
     Texture Texture::GetCopy() {
