@@ -7,7 +7,7 @@ find_package(SDL2_IMAGE REQUIRED)
 add_library(${PROJECT_NAME}
         src/KenazEngine.cpp include/Engine/KenazEngine.h
         src/Texture.cpp include/Engine/Texture.h
-        src/Map.cpp include/Engine/Map.h)
+        src/Map.cpp include/Engine/Map.h src/Camera.cpp include/Engine/Camera.h src/Joystick.cpp include/Engine/Joystick.h)
 
 if (WIN32)
     set(SDL2_IMAGE_LIBRARIES SDL2_image::SDL2_image)

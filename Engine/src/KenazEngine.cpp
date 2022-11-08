@@ -3,6 +3,7 @@
 //
 
 #include "Engine/KenazEngine.h"
+
 #include <memory>
 #include <utility>
 #include <iostream>
@@ -37,7 +38,7 @@ namespace KenazEngine {
     }
 
     bool KenazEngine::KenazEngine::Start() {
-        if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0) {
             printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
             return false;
         }
@@ -73,6 +74,13 @@ namespace KenazEngine {
                                                                        BackgroundColor.b,
                                                                        1));
         SDL_ShowCursor(SDL_DISABLE);
+        camera = new Camera(Renderer);
+        camera->screenDimensions.first = Resolution->first;
+        camera->screenDimensions.second = Resolution->second;
+        camera->MoveTo(100, 100);
+
+        cameraScale.first = 1.0f;
+        cameraScale.second = 1.0f;
 
         return true;
     }
@@ -83,15 +91,20 @@ namespace KenazEngine {
         SDL_Delay(1000/Framerate);
         SDL_RenderClear(Renderer);
         SDL_RenderCopy(Renderer, Background, nullptr, nullptr);
-    }
 
-    // Initializes Texture object
-    Texture *KenazEngine::CreateTexture() {
-        return new Texture(Renderer);
+        SDL_RenderSetScale(Renderer, cameraScale.first, cameraScale.second);
     }
 
     int KenazEngine::Quit() {
         SDL_DestroyWindow(Window);
         return 0;
+    }
+
+    // Initializes Texture object
+    // TODO: All created textures are automatically added to engine
+    //  and can be displayed by KenazEngine.ShowTextures()
+    Texture *KenazEngine::CreateTexture() {
+        texturesToShow.push_back(new Texture(Renderer, camera));
+        return texturesToShow.back();
     }
 }

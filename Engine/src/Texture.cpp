@@ -7,10 +7,12 @@
 
 namespace KenazEngine {
 
-    Texture::Texture(SDL_Renderer* renderer) {
+    Texture::Texture(SDL_Renderer* renderer, Camera *camera) {
         GameRenderer = renderer;
+        this->camera = camera;
         Position = std::make_shared<std::pair<int16_t, int16_t>>(0, 0);
         Size = std::make_shared<std::pair<uint16_t, uint16_t>>(128, 128);
+        Image = nullptr;
     }
 
     int Texture::Load(const std::string& fileName) {
@@ -64,30 +66,21 @@ namespace KenazEngine {
     }
 
     int Texture::Show() {
-        SDL_RenderCopy( GameRenderer, Image, nullptr,
-                        new SDL_Rect { Position->first - Size->first/2, Position->second - Size->second/2,
-                                                Size->first, Size->second });
+        SDL_Rect rect;
+        rect.x = Position->first - Size->first/2 - camera->Position.first;
+        rect.y = Position->second - Size->second/2 - camera->Position.second;
+        rect.w = Size->first;
+        rect.h = Size->second;
+        SDL_RenderCopy( GameRenderer, Image, nullptr, &rect);
         return 0;
-    }
-
-    SDL_Renderer *Texture::GetRenderer() {
-        return GameRenderer;
-    }
-
-    SDL_Texture *Texture::GetImage() {
-        return Image;
     }
 
     std::shared_ptr<std::pair<int16_t, int16_t>> Texture::GetPosition() {
         return Position;
     }
 
-    std::shared_ptr<std::pair<uint16_t, uint16_t>> Texture::GetSize() {
-        return Size;
-    }
-
     Texture Texture::GetCopy() {
-        Texture newTexture = Texture(GameRenderer);
+        Texture newTexture = Texture(GameRenderer, camera);
         newTexture.SetImage(Image);
         newTexture.MoveTo(Position->first, Position->second);
         newTexture.Resize(Size->first, Size->second);

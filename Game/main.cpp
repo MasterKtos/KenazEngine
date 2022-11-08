@@ -2,14 +2,28 @@
 #include "SDL.h"
 #include "Engine/KenazEngine.h"
 #include "Engine/Map.h"
+#include "Engine/Joystick.h"
 
 void Lerp(float &currPosX, float &currPosY, float destPosX, float destPosY, float lerpValue) {
     currPosX = currPosX + (destPosX - currPosX)*lerpValue;
     currPosY = currPosY + (destPosY - currPosY)*lerpValue;
 }
 
+int Distance(int first, int second) {
+    return (second - first);
+}
+
+std::pair<int, int> MiddlePoint(std::shared_ptr<std::pair<int16_t, int16_t>> firstPoint,
+                                std::shared_ptr<std::pair<int16_t, int16_t>> secondPoint) {
+    return {
+            firstPoint->first + Distance(firstPoint->first, secondPoint->first)/2,
+            firstPoint->second + Distance(firstPoint->second, secondPoint->second)/2
+    };
+}
+
 int main(int argc, char *argv[]) {
     KenazEngine::KenazEngine Kenaz;
+    Joystick joystick;
 
     // Initialize engine parameters
     Kenaz.SetTitle("SDL Project");
@@ -17,6 +31,8 @@ int main(int argc, char *argv[]) {
     Kenaz.SetBackgroundColor(1, 8, 16);
 
     if(!Kenaz.Start()) return 1;
+
+    joystick.Connect();
 
     KenazEngine::Texture* Player = Kenaz.CreateTexture();
     Player->Load("square.png");
@@ -26,7 +42,7 @@ int main(int argc, char *argv[]) {
     KenazEngine::Texture* Fren = Kenaz.CreateTexture();
     Fren->Load("circle.png");
     Fren->Resize(32, 32);
-    Fren->MoveTo(400, 300);
+    Fren->MoveTo(500, 300);
 
     //TODO: change the way events are handled
     SDL_Event event;
@@ -104,6 +120,17 @@ int main(int argc, char *argv[]) {
                 }
                 //printf("KEYUP | %d \n", event.key.keysym.sym);
             }
+            if(event.type == SDL_JOYAXISMOTION) {
+                switch(joystick.HandleInput(event)) {
+                    case MOVE_UP: frenMoveY = -5; break;
+                    case MOVE_DOWN: frenMoveY = 5; break;
+                    case STOP_VERTICAL: frenMoveY = 0; break;
+                    case MOVE_LEFT: frenMoveX = -5; break;
+                    case MOVE_RIGHT: frenMoveX = 5; break;
+                    case STOP_HORIZONTAL: frenMoveX = 0; break;
+                    case NONE: frenMoveX = 0; frenMoveY = 0; break;
+                }
+            }
             // capture mouse movement
             //if(event.type == SDL_MOUSEMOTION) {
             //    //printf("KEYMOTION [ %d | %d ] \n", event.motion.x, event.motion.y);
@@ -113,30 +140,31 @@ int main(int argc, char *argv[]) {
         }
         #pragma endregion
 
+        // Set render scale
+        if(abs(Distance(Player->GetPosition()->first, Fren->GetPosition()->first)) > Kenaz.camera->screenDimensions.first) {
+            float scaleX = Kenaz.camera->screenDimensions.first;
+            scaleX /= (float) abs(Distance(Player->GetPosition()->first,
+                                           Fren->GetPosition()->first));
+            std::cout << scaleX << std::endl;
+            Kenaz.cameraScale.first = scaleX;
+            Kenaz.cameraScale.second = scaleX;
+        }
+
         //Display stuff
         map.Show();
         Player->Show();
         Fren->Show();
 
-        //// Camera window on X axis
-        //if(abs(playerPosX + playerMoveX) <= moveRegion) {
-        //    Player->Move(playerMoveX, 0);
-        //    playerPosX += playerMoveX;
-        //}
-        //else
-        //    map.Move(-playerMoveX, 0);
-        //// Camera snap on player on Y axis
-        //map.Move(0, -playerMoveY);
-        //map.MoveTo((Fren->GetPosition()->first + Player->GetPosition()->first)/2,
-        //           (Fren->GetPosition()->second + Player->GetPosition()->second)/2 )
-
         Lerp(frenCurrentMoveX, frenCurrentMoveY,
              frenMoveX, frenMoveY, 0.1f);
         Player->Move(playerMoveX, playerMoveY);
         Fren->Move(frenMoveX, frenMoveY);
-        std::cout << Player->GetPosition()->first << " " <<
-                     Fren->GetPosition()->first << " " <<
-                     (Fren->GetPosition()->first + Player->GetPosition()->first)/2 << std::endl;
+
+        std::pair<int, int> middlePoint = MiddlePoint(Player->GetPosition(),
+                                                      Fren->GetPosition());
+
+        Kenaz.camera->MoveTo(middlePoint.first,
+                             middlePoint.second);
     }
 
     SDL_Quit();

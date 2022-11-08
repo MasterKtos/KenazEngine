@@ -21,37 +21,19 @@ void KenazEngine::Map::LoadMap(const char* filePath) {
             map.emplace_back(std::vector<KenazEngine::Texture>());
             int position = 1;
             for (char znak: lineString) {
+                Texture targetTexture(nullptr, nullptr);
+                position++;
                 switch (znak) {
-                    case ' ':
-                        position++;
-                        break;
-                    case '|':
-                        map.back().push_back(wallV.GetCopy());
-                        map.back().back().MoveTo(tileSize * position,
-                                                 tileSize * lineCount);
-                        position++;
-                        break;
-                    case '-':
-                        map.back().push_back(wallH.GetCopy());
-                        map.back().back().MoveTo(tileSize * position,
-                                                 tileSize * lineCount);
-                        position++;
-                        break;
-                    case '+':
-                        map.back().push_back(wallConnect.GetCopy());
-                        map.back().back().MoveTo(tileSize * position,
-                                                 tileSize * lineCount);
-                        position++;
-                        break;
-                    case '.':
-                        map.back().push_back(floor.GetCopy());
-                        map.back().back().MoveTo(tileSize * position,
-                                                 tileSize * lineCount);
-                        position++;
-                        break;
-                    default:
-                        break;
+                    case ' ': continue;
+                    case '|': targetTexture = wallV; break;
+                    case '-': targetTexture = wallH; break;
+                    case '+': targetTexture = wallConnect; break;
+                    case '.': targetTexture = floor; break;
+                    default:  position--; continue;
                 }
+                map.back().push_back(targetTexture.GetCopy());
+                map.back().back().MoveTo(tileSize * position,
+                                         tileSize * lineCount);
             }
             lineCount++;
         }

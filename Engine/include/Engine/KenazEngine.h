@@ -4,11 +4,12 @@
 #include <memory>
 #include <cstdint>
 #include <utility>
-//#include <SDL2/SDL.h>
-//#include <SDL_image.h>
 #include <SDL.h>
 #include <string>
+#include <vector>
+
 #include "Texture.h"
+#include "Camera.h"
 
 namespace KenazEngine {
 
@@ -22,16 +23,20 @@ namespace KenazEngine {
     class KenazEngine {
     private:
         std::shared_ptr<std::pair<uint16_t, uint16_t>> Resolution;
+        std::vector<Texture*> texturesToShow;
         Color BackgroundColor;
         std::string Title;
         uint8_t Framerate;
 
-    private:
         SDL_Window* Window;
         SDL_Renderer* Renderer;
         SDL_Texture* Background;
 
     public:
+        Camera* camera;
+        //TODO: change pls
+        std::pair<float, float> cameraScale;
+
         explicit KenazEngine();
 
         // call before init

@@ -15,10 +15,10 @@ namespace KenazEngine {
         std::vector<std::vector<Texture>> map;
         int tileSize;
 
-        Texture wallH = Texture(nullptr);
-        Texture wallV = Texture(nullptr);
-        Texture wallConnect = Texture(nullptr);
-        Texture floor = Texture(nullptr);
+        Texture wallH = Texture(nullptr, nullptr);
+        Texture wallV = Texture(nullptr, nullptr);
+        Texture wallConnect = Texture(nullptr, nullptr);
+        Texture floor = Texture(nullptr, nullptr);
     public:
         Map(int tileSize);
         void LoadMap(const char* filePath);
