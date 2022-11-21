@@ -140,15 +140,6 @@ int main(int argc, char *argv[]) {
         }
         #pragma endregion
 
-        // Set render scale
-        if(abs(Distance(Player->GetPosition()->first, Fren->GetPosition()->first)) > Kenaz.camera->screenDimensions.first) {
-            float scaleX = Kenaz.camera->screenDimensions.first;
-            scaleX /= (float) abs(Distance(Player->GetPosition()->first,
-                                           Fren->GetPosition()->first));
-            std::cout << scaleX << std::endl;
-            Kenaz.cameraScale.first = scaleX;
-            Kenaz.cameraScale.second = scaleX;
-        }
 
         //Display stuff
         map.Show();
@@ -160,11 +151,26 @@ int main(int argc, char *argv[]) {
         Player->Move(playerMoveX, playerMoveY);
         Fren->Move(frenMoveX, frenMoveY);
 
-        std::pair<int, int> middlePoint = MiddlePoint(Player->GetPosition(),
-                                                      Fren->GetPosition());
+        // Set render scale
+        if(abs(Distance(Player->GetPosition()->first, Fren->GetPosition()->first)) > Kenaz.camera->screenDimensions.first*0.8 ||
+            abs(Distance(Player->GetPosition()->second, Fren->GetPosition()->second)) > Kenaz.camera->screenDimensions.second*0.8) {
+            //float scaleX = Kenaz.camera->screenDimensions.first;
+            //scaleX /= (float) abs(Distance(Player->GetPosition()->first,
+            //                               Fren->GetPosition()->first));
+            //std::cout << scaleX << std::endl;
+            //Kenaz.cameraScale.first = scaleX;
+            //Kenaz.cameraScale.second = scaleX;
+            Kenaz.camera->MoveTo(Player->GetPosition()->first,
+                                 Player->GetPosition()->second);
+        }
+        else
+        {
+            std::pair<int, int> middlePoint = MiddlePoint(Player->GetPosition(),
+                                                          Fren->GetPosition());
 
-        Kenaz.camera->MoveTo(middlePoint.first,
-                             middlePoint.second);
+            Kenaz.camera->MoveTo(middlePoint.first,
+                                 middlePoint.second);
+        }
     }
 
     SDL_Quit();
