@@ -7,7 +7,7 @@ if(UNIX)
 endif()
 
 # Create the executable
-add_executable(${PROJECT_NAME} main.cpp)
+add_executable(${PROJECT_NAME} main.cpp game.cpp Ball.cpp Ball.h BallManager.cpp BallManager.h)
 
 
 # Link the static library from subproject1 using its alias sub::lib1

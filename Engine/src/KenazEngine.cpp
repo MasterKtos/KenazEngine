@@ -38,7 +38,8 @@ namespace KenazEngine {
     }
 
     bool KenazEngine::KenazEngine::Start() {
-        if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0) {
+        //if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0) {
+        if (SDL_Init(SDL_INIT_VIDEO) < 0) {
             printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
             return false;
         }
@@ -77,7 +78,7 @@ namespace KenazEngine {
         camera = new Camera(Renderer);
         camera->screenDimensions.first = Resolution->first;
         camera->screenDimensions.second = Resolution->second;
-        camera->MoveTo(100, 100);
+        //camera->MoveTo(100, 100);
 
         cameraScale.first = 1.0f;
         cameraScale.second = 1.0f;
@@ -92,7 +93,7 @@ namespace KenazEngine {
         SDL_RenderClear(Renderer);
         SDL_RenderCopy(Renderer, Background, nullptr, nullptr);
 
-        SDL_RenderSetScale(Renderer, cameraScale.first, cameraScale.second);
+        //SDL_RenderSetScale(Renderer, cameraScale.first, cameraScale.second);
     }
 
     int KenazEngine::Quit() {
