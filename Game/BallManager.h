@@ -6,8 +6,20 @@
 #define KENAZENGINEGAME_BALLMANAGER_H
 
 
-class BallManager {
+#include <vector>
+#include "Ball.h"
 
+class BallManager {
+private:
+    std::vector<Ball> balls;
+
+public:
+    BallManager();
+
+    void ShowBalls();
+
+    void CreateBalls(int amount, KenazEngine::Texture &templateTexture);
+    void MoveBalls();
 };
 
 

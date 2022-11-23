@@ -6,20 +6,32 @@
 #define KENAZENGINEGAME_BALL_H
 
 #include "Engine/Texture.h"
-
-struct Vector2 {int x, y;};
+#include "Vector2.h"
 
 class Ball {
 private:
-    int radius;
+    int id;
+    float radius;
     Vector2 position;
+    Vector2 speed;
     KenazEngine::Texture texture;
 
 public:
-    Ball(KenazEngine::Texture &ballTexture);
-    void SetRadius(int newRadius);
-    void SetPosition(int x, int y);
+    Ball(KenazEngine::Texture &ballTexture, int id);
+    void SetRadius(float newRadius);
+    void SetPosition(float x, float y);
     void SetPosition(Vector2 newPosition);
+    void SetSpeed(float x, float y);
+
+    bool isInBounds(int widthMax, int heightMax) const;
+    bool isColliding(Vector2 secondBallPos, float secondBallRadius);
+
+    void Move();
+    void Show();
+
+    int GetID() const;
+    Vector2 GetPosition() const;
+    float GetRadius() const;
 };
 
 
