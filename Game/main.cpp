@@ -2,6 +2,7 @@
 #include <iostream>
 #include "SDL.h"
 #include "Engine/KenazEngine.h"
+#include "BallManager.h"
 
 float vectorLength(float x, float y) {
     return std::sqrt(x*x + y*y);
@@ -19,7 +20,7 @@ int main(int argc, char *argv[]) {
     KenazEngine::KenazEngine Kenaz;
 
     // Initialize engine parameters
-    Kenaz.SetTitle("SDL Project");
+    Kenaz.SetTitle("KenazEngine Game");
     Kenaz.SetResolution(screenSize.first, screenSize.second);
     Kenaz.SetBackgroundColor(1, 8, 16);
 
@@ -30,27 +31,13 @@ int main(int argc, char *argv[]) {
     Fren->Resize(32, 32);
     Fren->MoveTo(500, 400);
 
-    float frenMoveX = 0;
-    float frenMoveY = 0;
-    float frenPos[2] = {500, 400};
-
-    float moveVectorX = -5;
-    float moveVectorY = 0;
-
-    KenazEngine::Texture* Fren2 = Kenaz.CreateTexture();
-    Fren2->Load("circle.png");
-    Fren2->Resize(32, 32);
-    Fren2->MoveTo(100, 400);
-
-    float fren2MoveX = 0;
-    float fren2MoveY = 0;
-    float fren2Pos[2] = {100, 400};
-    float radius = 16;
-
-    float moveVector2X = 5;
-    float moveVector2Y = 0;
+    BallManager ballManager;
+    ballManager.CreateBalls(50, *Fren);
+    ballManager.RandomizeBalls();
 
     SDL_Event event;
+
+    printf("=============================\n|| [R] - toggle reflection ||\n|| [S] - toggle separation ||\n=============================\n\n");
 
     for (int i=0;;i++) {
         Kenaz.UpdateBegin();
@@ -59,60 +46,26 @@ int main(int argc, char *argv[]) {
             if (event.type == SDL_QUIT) {
                 return Kenaz.Quit();
             }
+            if(event.type == SDL_KEYUP) {
+                switch (event.key.keysym.sym) {
+                    case SDLK_s:
+                        ballManager.separationEnabled = !ballManager.separationEnabled;
+                        printf("Separation: ");
+                        printf(ballManager.separationEnabled? "ON\n" : "OFF\n");
+                        break;
+                    case SDLK_r:
+                        ballManager.reflectionEnabled = !ballManager.reflectionEnabled;
+                        printf("Reflection: ");
+                        printf(ballManager.reflectionEnabled? "ON\n" : "OFF\n");
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
 
-        Fren->Show();
-        Fren2->Show();
+        ballManager.ShowBalls();
 
-        if(collided(frenPos, fren2Pos, radius))
-        {
-            printf("e\n");
-            moveVectorX = -moveVectorX;
-            moveVectorY = -moveVectorY;
-
-            moveVector2X = -moveVector2X;
-            moveVector2Y = -moveVector2Y;
-        }
-
-        frenMoveX = moveVectorX;
-        frenMoveY = moveVectorY;
-
-        frenPos[0] += frenMoveX;
-        frenPos[1] += frenMoveY;
-
-        if(frenPos[0] <= 0 || frenPos[0] >= screenSize.first)
-        {
-            moveVectorX = -moveVectorX;
-            frenMoveX = moveVectorX*2;
-            frenPos[0] += frenMoveX;
-        }
-        if(frenPos[1] <= 0 || frenPos[1] >= screenSize.second)
-        {
-            moveVectorY = -moveVectorY;
-            frenMoveY = moveVectorY*2;
-            frenPos[1] += frenMoveY;
-        }
-
-        fren2MoveX = moveVector2X;
-        fren2MoveY = moveVector2Y;
-
-        fren2Pos[0] += fren2MoveX;
-        fren2Pos[1] += fren2MoveY;
-
-        if(fren2Pos[0] <= 0 || fren2Pos[0] >= screenSize.first)
-        {
-            moveVector2X = -moveVector2X;
-            fren2MoveX = moveVector2X*2;
-            fren2Pos[0] += fren2MoveX;
-        }
-        if(fren2Pos[1] <= 0 || fren2Pos[1] >= screenSize.second)
-        {
-            moveVector2Y = -moveVector2Y;
-            fren2MoveY = moveVector2Y*2;
-            fren2Pos[1] += fren2MoveY;
-        }
-
-        Fren->Move(frenMoveX, frenMoveY);
-        Fren2->Move(fren2MoveX, fren2MoveY);
+        ballManager.MoveBalls();
     }
 }

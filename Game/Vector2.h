@@ -23,6 +23,19 @@ public:
     Vector2 operator-(Vector2 other) const {
         return {x-other.x, y-other.y};
     }
+    Vector2 operator/(Vector2 other) const {
+        return {x/other.x, y/other.y};
+    }
+    Vector2 operator/(float other) const {
+        return {x/other, y/other};
+    }
+    Vector2 operator*(float other) const {
+        return {x*other, y*other};
+    }
+    // Negation
+    Vector2 operator-() const {
+        return {-x, -y};
+    }
 };
 
 #endif //KENAZENGINEGAME_VECTOR2_H

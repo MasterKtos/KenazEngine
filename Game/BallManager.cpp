@@ -4,8 +4,7 @@
 
 #include "BallManager.h"
 
-BallManager::BallManager() {
-
+BallManager::BallManager() : reflectionEnabled(true), separationEnabled(true) {
 }
 
 void BallManager::ShowBalls() {
@@ -17,24 +16,31 @@ void BallManager::CreateBalls(int amount, KenazEngine::Texture &templateTexture)
         balls.emplace_back(templateTexture, i);
 }
 
+void BallManager::RandomizeBalls() {
+    srand(time(nullptr));
+    for(Ball &ball : balls) {
+        ball.SetPosition(rand() % 800 + 1, rand() % 600 + 1);
+        float radius = rand() % 5 + 15;
+        ball.SetSpeed((20 - radius) * (rand()%2 == 1? -1:1),
+                      (20 - radius) * (rand()%2 == 1? -1:1));
+        ball.SetRadius(radius);
+    }
+}
+
 void BallManager::MoveBalls() {
-    // Detect collisions
-    for(Ball firstBall : balls) {
-        for(Ball secondBall : balls) {
+    for(Ball &firstBall : balls) {
+        for(Ball &secondBall : balls) {
+            // Detect collisions with other balls
             if(firstBall.GetID() == secondBall.GetID()) continue;
             if(firstBall.isColliding(secondBall.GetPosition(), secondBall.GetRadius()))
             {
-                float distance = firstBall.GetPosition().Distance(secondBall.GetPosition());
-                float overlap = distance - firstBall.GetRadius() - secondBall.GetRadius();
-                Vector2 displace, separationVector;
-                separationVector.x = (firstBall.GetPosition().x - secondBall.GetPosition().x) / distance;
-                separationVector.y = (firstBall.GetPosition().y - secondBall.GetPosition().y) / distance;
-
-                displace.x = overlap * 0.5f * separationVector.x;
-                displace.y = overlap * 0.5f * separationVector.y;
-                firstBall.SetPosition(firstBall.GetPosition() - displace);
-                secondBall.SetPosition(secondBall.GetPosition() + displace);
+                firstBall.OnCollide(secondBall.GetPosition(), secondBall.GetRadius(), reflectionEnabled, separationEnabled);
+                secondBall.OnCollide(firstBall.GetPosition(), firstBall.GetRadius(), reflectionEnabled, separationEnabled);
             }
         }
+        // Detect collisions with boundaries
+        firstBall.CheckBounds(800, 600);
+
+        firstBall.Move();
     }
 }

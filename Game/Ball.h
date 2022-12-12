@@ -22,8 +22,9 @@ public:
     void SetPosition(float x, float y);
     void SetPosition(Vector2 newPosition);
     void SetSpeed(float x, float y);
+    void Reflect(Vector2 normalVector);
 
-    bool isInBounds(int widthMax, int heightMax) const;
+    void CheckBounds(int widthMax, int heightMax);
     bool isColliding(Vector2 secondBallPos, float secondBallRadius);
 
     void Move();
@@ -32,6 +33,8 @@ public:
     int GetID() const;
     Vector2 GetPosition() const;
     float GetRadius() const;
+
+    void OnCollide(Vector2 pos, float r, bool reflection, bool separation);
 };
 
 

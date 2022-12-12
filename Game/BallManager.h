@@ -14,11 +14,15 @@ private:
     std::vector<Ball> balls;
 
 public:
+    bool separationEnabled;
+    bool reflectionEnabled;
+
     BallManager();
 
     void ShowBalls();
 
     void CreateBalls(int amount, KenazEngine::Texture &templateTexture);
+    void RandomizeBalls();
     void MoveBalls();
 };
 
