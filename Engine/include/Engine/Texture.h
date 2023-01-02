@@ -7,6 +7,7 @@
 
 #include "SDL.h"
 #include "Camera.h"
+#include "Vector2.h"
 #include <SDL_image.h>
 #include <string>
 #include <memory>
@@ -15,29 +16,35 @@
 namespace KenazEngine {
 
     class Texture {
-    private:
+    protected:
         SDL_Texture* Image;
         SDL_Renderer* GameRenderer;
         Camera* camera;
-        std::shared_ptr<std::pair<int16_t, int16_t>> Position;
-        std::shared_ptr<std::pair<uint16_t, uint16_t>> Size;
+        Vector2 Position;
+        Vector2 Size;
     public:
         // Needs SDL_Renderer from KenazEngine
         Texture(SDL_Renderer *renderer, Camera *camera);
 
         int Load(const std::string& fileName);
-        int Show();
 
-        int Resize(int16_t x, int16_t y);
-        int Move(int16_t x, int16_t y);
-        int MoveTo(int16_t x, int16_t y);
+        virtual int Show();
+
+        int Resize(float x, float y);
+        int Resize(Vector2 size);
+        int Move(float x, float y);
+        int Move(Vector2 vector);
+        int MoveTo(float x, float y);
+        int MoveTo(Vector2 position);
 
 
         // For texture copy
         // TODO: replace with something better
         Texture GetCopy();
         void SetImage(SDL_Texture* image);
-        std::shared_ptr<std::pair<int16_t, int16_t>> GetPosition();
+        Vector2 GetPosition();
+
+        bool operator==(const Texture& texture);
     };
 }
 

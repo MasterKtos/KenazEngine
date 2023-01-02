@@ -7,6 +7,7 @@
 
 
 #include <utility>
+#include "Vector2.h"
 
 class SDL_Renderer;
 
@@ -16,13 +17,16 @@ private:
 
 public:
     Camera(SDL_Renderer* renderer);
-    std::pair<int, int> Position;
-    std::pair<int, int> screenDimensions;
+    Vector2 Position;
+    Vector2 screenDimensions;
 
     void MoveTo(int x, int y);
+    void MoveTo(Vector2 position);
     void Move(int x, int y);
+    void Move(Vector2 offset);
 
     void Scale(int x, int y);
+    void Scale(Vector2 scale);
 };
 
 

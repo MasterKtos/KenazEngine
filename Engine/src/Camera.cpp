@@ -7,21 +7,25 @@
 #include <iostream>
 
 Camera::Camera(SDL_Renderer* renderer) {
-    Position = std::pair<int, int>(0, 0);
+    Position = Vector2(0, 0);
     Renderer = renderer;
 }
 
 void Camera::MoveTo(int x, int y) {
-    Position = std::pair<int, int>(x - screenDimensions.first/2,
-                                   y - screenDimensions.second/2);
+    Position = Vector2(x - screenDimensions.x/2,
+                       y - screenDimensions.y/2);
 }
 
 void Camera::Move(int x, int y) {
-    Position.first += x;
-    Position.second += y;
+    Position.x += x;
+    Position.y += y;
 }
 
 void Camera::Scale(int x, int y) {
     int errorCode = SDL_RenderSetScale(Renderer, x, y);
     std::cout << errorCode << " | " << SDL_GetError() << std::endl;
 }
+
+void Camera::MoveTo(Vector2 position) { MoveTo(position.x, position.y); }
+void Camera::Move(Vector2 offset) { Move(offset.x, offset.y); }
+void Camera::Scale(Vector2 scale) { Scale(scale.x, scale.y); }

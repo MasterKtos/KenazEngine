@@ -3,6 +3,7 @@
 //
 
 #include "Engine/KenazEngine.h"
+#include "Engine/Overlay.h"
 
 #include <memory>
 #include <utility>
@@ -76,8 +77,8 @@ namespace KenazEngine {
                                                                        1));
         SDL_ShowCursor(SDL_DISABLE);
         camera = new Camera(Renderer);
-        camera->screenDimensions.first = Resolution->first;
-        camera->screenDimensions.second = Resolution->second;
+        camera->screenDimensions.x = Resolution->first;
+        camera->screenDimensions.y = Resolution->second;
         //camera->MoveTo(100, 100);
 
         cameraScale.first = 1.0f;
@@ -94,6 +95,7 @@ namespace KenazEngine {
         SDL_RenderCopy(Renderer, Background, nullptr, nullptr);
 
         //SDL_RenderSetScale(Renderer, cameraScale.first, cameraScale.second);
+        return 0;
     }
 
     int KenazEngine::Quit() {
@@ -107,5 +109,8 @@ namespace KenazEngine {
     Texture *KenazEngine::CreateTexture() {
         texturesToShow.push_back(new Texture(Renderer, camera));
         return texturesToShow.back();
+    }
+    std::shared_ptr<Overlay> KenazEngine::CreateOverlay() {
+        return std::make_shared<Overlay>(Renderer, camera);
     }
 }

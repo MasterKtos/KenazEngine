@@ -9,35 +9,38 @@ KenazEngine::Map::Map(int tileSize) : tileSize(tileSize){
 }
 
 void KenazEngine::Map::LoadMap(const char* filePath) {
-    std::string mapString;
-    std::string lineString;
-
-    // load file
     std::fstream newfile;
     newfile.open(filePath,std::ios::in);
     if (newfile.is_open()) {
-        int lineCount = 1;
-        while (getline(newfile, lineString)) {
-            map.emplace_back(std::vector<KenazEngine::Texture>());
-            int position = 1;
-            for (char znak: lineString) {
-                Texture targetTexture(nullptr, nullptr);
-                position++;
-                switch (znak) {
-                    case ' ': continue;
-                    case '|': targetTexture = wallV; break;
-                    case '-': targetTexture = wallH; break;
-                    case '+': targetTexture = wallConnect; break;
-                    case '.': targetTexture = floor; break;
-                    default:  position--; continue;
-                }
-                map.back().push_back(targetTexture.GetCopy());
-                map.back().back().MoveTo(tileSize * position,
-                                         tileSize * lineCount);
-            }
-            lineCount++;
-        }
+        FileToMap(newfile);
         newfile.close();
+    }
+}
+
+void KenazEngine::Map::FileToMap(std::fstream &mapfile) {
+    int lineCount = 1;
+    std::string lineString;
+
+    while (getline(mapfile, lineString)) {
+        map.emplace_back(std::vector<KenazEngine::Texture>());
+        int position = 1;
+        for (char znak: lineString) {
+            Texture targetTexture(nullptr, nullptr);
+            map.back().emplace_back(nullptr, nullptr);
+            position++;
+            switch (znak) {
+                case ' ': continue;
+                case '|': targetTexture = wallV; break;
+                case '-': targetTexture = wallH; break;
+                case '+': targetTexture = wallConnect; break;
+                case '.': targetTexture = floor; break;
+                default:  position--; continue;
+            }
+            map.back().back() = targetTexture.GetCopy();
+            map.back().back().MoveTo(tileSize * position,
+                                     tileSize * lineCount);
+        }
+        lineCount++;
     }
 }
 
@@ -59,6 +62,10 @@ void KenazEngine::Map::Move(int x, int y) {
 
 // h-horizontal wall, v-vertical wall, c-wall connector, f-floor
 void KenazEngine::Map::LoadTile(char tileCode, KenazEngine::Texture *tileLoad) {
+    tiles.find(tileCode)->second = tileLoad->GetCopy();
+    tiles.find(tileCode)->second.Resize(tileSize, tileSize);
+    //return;
+
     switch(tileCode) {
         case 'h':
             this->wallH = tileLoad->GetCopy();
@@ -79,4 +86,14 @@ void KenazEngine::Map::LoadTile(char tileCode, KenazEngine::Texture *tileLoad) {
         default:
             return;
     }
+}
+
+char KenazEngine::Map::GetTileByPosition(Vector2 position) {
+    printf("Position to index mapping: [%d, %d]", (int)position.x/tileSize, (int)position.y/tileSize);
+    Texture tile = map[(int)position.x/tileSize][(int)position.y/tileSize];
+    if(tile == wallH) return 'h';
+    if(tile == wallV) return 'v';
+    if(tile == wallConnect) return 'c';
+    if(tile == floor) return 'f';
+    return 0;
 }

@@ -6,7 +6,7 @@
 #define KENAZENGINEGAME_BALL_H
 
 #include "Engine/Texture.h"
-#include "Vector2.h"
+#include "Engine/Vector2.h"
 
 class Ball {
 private:

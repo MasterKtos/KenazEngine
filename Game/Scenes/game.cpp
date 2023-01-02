@@ -13,15 +13,7 @@ int Distance(int first, int second) {
     return (second - first);
 }
 
-std::pair<int, int> MiddlePoint(std::shared_ptr<std::pair<int16_t, int16_t>> firstPoint,
-                                std::shared_ptr<std::pair<int16_t, int16_t>> secondPoint) {
-    return {
-            firstPoint->first + Distance(firstPoint->first, secondPoint->first)/2,
-            firstPoint->second + Distance(firstPoint->second, secondPoint->second)/2
-    };
-}
-
-int run() {
+int game_run() {
     KenazEngine::KenazEngine Kenaz;
     Joystick joystick;
 
@@ -51,7 +43,7 @@ int run() {
     float playerMoveY;
 
     float moveRegion = 50;
-    std::pair<uint16_t, uint16_t> screenCentre(400, 300);
+    Vector2 screenCentre(400, 300);
     float playerPosX = 0;
 
     float frenMoveX = 0;
@@ -77,7 +69,7 @@ int run() {
     map.LoadTile('h', WallH);
     map.LoadTile('v', WallV);
     map.LoadTile('c', WallC);
-    map.LoadMap("../../map.txt");
+    map.LoadMap("../../map1.txt");
 
     for (int i=0;;i++) {
         Kenaz.UpdateBegin();
@@ -141,10 +133,10 @@ int run() {
 #pragma endregion
 
         // Set render scale
-        if(abs(Distance(Player->GetPosition()->first, Fren->GetPosition()->first)) > Kenaz.camera->screenDimensions.first) {
-            float scaleX = Kenaz.camera->screenDimensions.first;
-            scaleX /= (float) abs(Distance(Player->GetPosition()->first,
-                                           Fren->GetPosition()->first));
+        if(abs(Distance(Player->GetPosition().x, Fren->GetPosition().x)) > Kenaz.camera->screenDimensions.x) {
+            float scaleX = Kenaz.camera->screenDimensions.x;
+            scaleX /= (float) abs(Distance(Player->GetPosition().x,
+                                           Fren->GetPosition().x));
             std::cout << scaleX << std::endl;
             Kenaz.cameraScale.first = scaleX;
             Kenaz.cameraScale.second = scaleX;
@@ -160,11 +152,11 @@ int run() {
         Player->Move(playerMoveX, playerMoveY);
         Fren->Move(frenMoveX, frenMoveY);
 
-        std::pair<int, int> middlePoint = MiddlePoint(Player->GetPosition(),
+        auto middlePoint = Vector2::MiddlePoint(Player->GetPosition(),
                                                       Fren->GetPosition());
 
-        Kenaz.camera->MoveTo(middlePoint.first,
-                             middlePoint.second);
+        Kenaz.camera->MoveTo(middlePoint.x,
+                             middlePoint.y);
     }
 
     SDL_Quit();

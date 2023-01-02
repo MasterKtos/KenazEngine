@@ -10,6 +10,7 @@
 
 #include "Texture.h"
 #include "Camera.h"
+#include "Overlay.h"
 
 namespace KenazEngine {
 
@@ -49,6 +50,7 @@ namespace KenazEngine {
         int Quit();
 
         Texture* CreateTexture();
+        std::shared_ptr<Overlay> CreateOverlay();
     };
 
 }

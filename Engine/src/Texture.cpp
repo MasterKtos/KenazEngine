@@ -10,14 +10,14 @@ namespace KenazEngine {
     Texture::Texture(SDL_Renderer* renderer, Camera *camera) {
         GameRenderer = renderer;
         this->camera = camera;
-        Position = std::make_shared<std::pair<int16_t, int16_t>>(0, 0);
-        Size = std::make_shared<std::pair<uint16_t, uint16_t>>(128, 128);
+        Position = Vector2(0, 0);
+        Size = Vector2(128, 128);
         Image = nullptr;
     }
 
     int Texture::Load(const std::string& fileName) {
 
-        //LoadMap image at specified path
+        //LoadMapTextures image at specified path
         std::string filePath;
         //TODO: get project directory
         filePath.append(SDL_GetBasePath())
@@ -30,8 +30,8 @@ namespace KenazEngine {
             return 1;
         }
 
-        Size->first = loadedSurface->w;
-        Size->second = loadedSurface->h;
+        Size.x = loadedSurface->w;
+        Size.y = loadedSurface->h;
 
         //Create texture from surface pixels
         Image = SDL_CreateTextureFromSurface( GameRenderer, loadedSurface );
@@ -47,47 +47,55 @@ namespace KenazEngine {
         return 0;
     }
 
-    int Texture::Resize(int16_t x, int16_t y) {
-        Size->first = x;
-        Size->second = y;
+    int Texture::Resize(float x, float y) {
+        Size.x = x;
+        Size.y = y;
         return 0;
     }
 
-    int Texture::Move(int16_t x, int16_t y) {
-        Position->first = Position->first + x;
-        Position->second = Position->second + y;
+    int Texture::Move(float x, float y) {
+        Position.x += x;
+        Position.y += y;
         return 0;
     }
 
-    int Texture::MoveTo(int16_t x, int16_t y) {
-        Position->first = x;
-        Position->second = y;
+    int Texture::MoveTo(float x, float y) {
+        Position.x = x;
+        Position.y = y;
         return 0;
     }
 
     int Texture::Show() {
         SDL_Rect rect;
-        rect.x = Position->first - Size->first/2 - camera->Position.first;
-        rect.y = Position->second - Size->second/2 - camera->Position.second;
-        rect.w = Size->first;
-        rect.h = Size->second;
+        rect.x = Position.x - Size.x/2 - camera->Position.x;
+        rect.y = Position.y - Size.y/2 - camera->Position.y;
+        rect.w = Size.x;
+        rect.h = Size.y;
         SDL_RenderCopy( GameRenderer, Image, nullptr, &rect);
         return 0;
     }
 
-    std::shared_ptr<std::pair<int16_t, int16_t>> Texture::GetPosition() {
+    Vector2 Texture::GetPosition() {
         return Position;
     }
 
     Texture Texture::GetCopy() {
         Texture newTexture = Texture(GameRenderer, camera);
         newTexture.SetImage(Image);
-        newTexture.MoveTo(Position->first, Position->second);
-        newTexture.Resize(Size->first, Size->second);
+        newTexture.MoveTo(Position.x, Position.y);
+        newTexture.Resize(Size.x, Size.y);
         return newTexture;
     }
 
     void Texture::SetImage(SDL_Texture* image) {
         Image = image;
+    }
+
+    int Texture::Resize(Vector2 size) { return Resize(size.x, size.y); }
+    int Texture::Move(Vector2 vector) { return Move(vector.x, vector.y); }
+    int Texture::MoveTo(Vector2 position) { return MoveTo(position.x, position.y); }
+
+    bool Texture::operator==(const Texture& texture) {
+        return this->Image == texture.Image;
     }
 }
