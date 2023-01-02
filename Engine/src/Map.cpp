@@ -47,7 +47,7 @@ void KenazEngine::Map::FileToMap(std::fstream &mapfile) {
 void KenazEngine::Map::Show() {
     for(const auto& line : map) {
         for(auto tile : line) {
-            tile.Show();
+            if(tile.isValid()) tile.Show();
         }
     }
 }
@@ -88,12 +88,58 @@ void KenazEngine::Map::LoadTile(char tileCode, KenazEngine::Texture *tileLoad) {
     }
 }
 
-char KenazEngine::Map::GetTileByPosition(Vector2 position) {
-    printf("Position to index mapping: [%d, %d]", (int)position.x/tileSize, (int)position.y/tileSize);
-    Texture tile = map[(int)position.x/tileSize][(int)position.y/tileSize];
-    if(tile == wallH) return 'h';
-    if(tile == wallV) return 'v';
-    if(tile == wallConnect) return 'c';
-    if(tile == floor) return 'f';
-    return 0;
+KenazEngine::Texture KenazEngine::Map::GetTileByPosition(Vector2 position) {
+    //printf("Position to index mapping: [%d, %d]; Player position: %s",
+    //       (int)position.x/tileSize, (int)position.y/tileSize, position.toString().c_str());
+    Vector2 index((int)position.y/tileSize - 1, (int)position.x/tileSize - 2);
+    Texture tile = map[index.x][index.y];
+    //tile.Resize({2, 2});
+    return tile;
+}
+
+std::vector<Vector2> KenazEngine::Map::CheckCollisions(Vector2 position) {
+    // Player position but centered on the nearest tile
+    // ------------------------------------------------
+    Vector2 remainder((int)position.x%tileSize, (int)position.y%tileSize);
+    Vector2 nPosition = {
+            remainder.x>=tileSize/2 ? position.x + (tileSize - remainder.x) : position.x - remainder.x,
+            remainder.y>=tileSize/2 ? position.y + (tileSize - remainder.y) : position.y - remainder.y
+    };
+    //printf("[[ remainder: %s || normalized pos: %s ]]",
+    //       remainder.toString().c_str(), nPosition.toString().c_str());
+
+    // Tiles around player
+    // -------------------
+    //                                N
+    //                              W   E
+    //                                s
+    std::vector<Vector2> tilePositions = {
+            { nPosition.x, nPosition.y - tileSize },              //  N
+            { nPosition.x + tileSize, nPosition.y - tileSize },   //  NE
+            { nPosition.x + tileSize, nPosition.y },              //   E
+            { nPosition.x + tileSize, nPosition.y + tileSize },   //  SE
+            { nPosition.x, nPosition.y + tileSize },              //  S
+            { nPosition.x - tileSize, nPosition.y + tileSize },   // WS
+            { nPosition.x - tileSize, nPosition.y },              // W
+            { nPosition.x - tileSize, nPosition.y - tileSize }    // WN
+    };
+    std::vector<Vector2> collisions;
+
+    for (auto tilePos : tilePositions) {
+        // Player is not "standing" on tile
+        // --------------------------------
+        if(position.Distance(tilePos) >= tileSize*1.1f) continue;
+
+        // Get tile at position and check if it's not empty
+        // ------------------------------------------------
+        auto tile = GetTileByPosition(tilePos);
+        if(!tile.isValid()) continue;
+
+        // Player collides if tile is a wall
+        // ---------------------------------
+        if(tile == wallH || tile == wallV || tile == wallConnect)
+            collisions.push_back(tilePos);
+    }
+
+    return collisions;
 }

@@ -2,7 +2,7 @@
 // Created by MasterKtos on 22.11.2022.
 //
 
-#include "BallManager.h"
+#include "../BallManager.h"
 
 BallManager::BallManager() : reflectionEnabled(true), separationEnabled(true) {
 }

@@ -6,6 +6,7 @@
 #define KENAZENGINEGAME_VECTOR2_H
 
 #include <cmath>
+#include <string>
 
 #include "cmath"
 
@@ -19,6 +20,10 @@ public:
 
     float Distance(Vector2 pos) const {
         return std::sqrt((x - pos.x) * (x - pos.x) + (y - pos.y) * (y - pos.y));
+    }
+
+    std::string toString() const {
+        return "["+std::to_string((int)x)+", "+std::to_string((int)y)+"]";
     }
 
     static Vector2 Lerp(Vector2 position, Vector2 destination, float lerpValue) {
@@ -53,6 +58,17 @@ public:
 
     Vector2 operator*(float other) const {
         return {x * other, y * other};
+    }
+    Vector2 operator*(Vector2 other) const {
+        return {x * other.x, y * other.y};
+    }
+
+    Vector2& operator=(Vector2 other) {
+        x = other.x; y = other.y;
+    }
+
+    void operator-=(Vector2 other) {
+        x -= other.x; y -= other.y;
     }
 
     // Negation

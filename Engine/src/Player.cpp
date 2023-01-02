@@ -26,3 +26,22 @@ void KenazEngine::Player::Move() {
 Vector2 KenazEngine::Player::GetPosition() {
     return texture->GetPosition();
 }
+
+void KenazEngine::Player::OnCircleCollide(Vector2 pos) {
+    Vector2 position = texture->GetPosition();
+    float distance = position.Distance(pos);
+    Vector2 normalVector = (position - pos)/distance;
+
+    printf("%s\n", normalVector.toString().c_str());
+
+    // Separation
+    // ----------
+    //texture->Move(-normalVector * (radius*1.5 - distance));
+    texture->Move(-currentSpeed * 1.1f);
+
+    // Reflection
+    // ----------
+    float dotProduct = 2*(currentSpeed.x*normalVector.x + currentSpeed.y*normalVector.y);
+    //currentSpeed -= (normalVector * dotProduct)/2;
+    currentSpeed -= currentSpeed * 1.1f;
+}

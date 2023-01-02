@@ -2,7 +2,7 @@
 #include <iostream>
 #include "SDL.h"
 #include "Engine/KenazEngine.h"
-#include "../BallManager.h"
+#include "../Scripts/BallManager.h"
 
 int balls_bouncing_run() {
     std::pair<int, int> screenSize = {800, 600};

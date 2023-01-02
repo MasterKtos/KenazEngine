@@ -4,7 +4,7 @@
 
 #include <fstream>
 #include <sstream>
-#include "Maze.h"
+#include "../Maze.h"
 
 Maze::Maze(int tileSize) :
         Map(tileSize),
@@ -21,7 +21,8 @@ void Maze::LoadMap(const char *filePath) {
         // --------------------
         getline(newfile, fileTargetPos);
         std::stringstream targetPos(fileTargetPos);
-        targetPos >> target.x >> target.y;
+        targetPos >> target.y >> target.x;
+        target = target * tileSize;
         targetTile.MoveTo(target);
 
         FileToMap(newfile);

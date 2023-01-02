@@ -6,7 +6,8 @@
 #include "Engine/Vector2.h"
 #include "Engine/Player.h"
 #include "Engine/Overlay.h"
-#include "Maze.h"
+#include "Scripts/Maze.h"
+#include "Scripts/Indicator.h"
 
 // Predeclarations
 // ---------------
@@ -52,6 +53,9 @@ int main(int argc, char *argv[]) {
     KenazEngine::Texture* targetTexture = Kenaz.CreateTexture();
     targetTexture->Load("circle.png");
 
+    KenazEngine::Texture*  indicatorTex = Kenaz.CreateTexture();
+    indicatorTex->Load("indicator.png");
+
     KenazEngine::Texture* playerTexture = Kenaz.CreateTexture();
     playerTexture->Load("square.png");
     playerTexture->Resize(tileSize, tileSize);
@@ -69,6 +73,9 @@ int main(int argc, char *argv[]) {
     player.lerp = 0.2f;
     fren.SetTexture(frenTexture);
     fren.lerp = 0.2f;
+
+    Indicator indicator(nullptr, nullptr);
+    indicator = indicatorTex->GetCopy();
 
     // Load map
     // --------
@@ -155,18 +162,29 @@ int GameLoop(KenazEngine::KenazEngine &Kenaz,
             }
         }
 
+
         // Display stuff
         // -------------
         map.Show();
         player.Show();
         fren.Show();
         countdown[currentTime]->Show();
-        printf("Tile: %c\n", map.GetTileByPosition(player.GetPosition()));
+
 
         // Apply movement
         // --------------
         player.Move();
         fren.Move();
+
+        // Check collisions
+        // ----------------
+        for(auto collision : map.CheckCollisions(player.GetPosition())) {
+            player.OnCircleCollide(collision);
+        }
+
+        for(auto collision : map.CheckCollisions(fren.GetPosition())) {
+            fren.OnCircleCollide(collision);
+        }
 
         // Move camera
         // -----------

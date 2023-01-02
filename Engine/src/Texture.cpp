@@ -98,4 +98,8 @@ namespace KenazEngine {
     bool Texture::operator==(const Texture& texture) {
         return this->Image == texture.Image;
     }
+
+    bool Texture::isValid() {
+        return (GameRenderer != nullptr || camera != nullptr || Image != nullptr);
+    }
 }

@@ -17,11 +17,11 @@ namespace KenazEngine {
 
     class Texture {
     protected:
-        SDL_Texture* Image;
         SDL_Renderer* GameRenderer;
         Camera* camera;
         Vector2 Position;
         Vector2 Size;
+        SDL_Texture* Image;
     public:
         // Needs SDL_Renderer from KenazEngine
         Texture(SDL_Renderer *renderer, Camera *camera);
@@ -45,6 +45,7 @@ namespace KenazEngine {
         Vector2 GetPosition();
 
         bool operator==(const Texture& texture);
+        bool isValid();
     };
 }
 

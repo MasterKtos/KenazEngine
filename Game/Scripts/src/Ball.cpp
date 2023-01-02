@@ -2,7 +2,7 @@
 // Created by MasterKtos on 22.11.2022.
 //
 
-#include "Ball.h"
+#include "../Ball.h"
 
 
 Ball::Ball(KenazEngine::Texture &ballTexture, int id) : texture(ballTexture.GetCopy()),

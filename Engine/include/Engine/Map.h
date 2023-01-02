@@ -38,7 +38,10 @@ namespace KenazEngine {
 
         virtual void Show();
         void Move(int x, int y);
-        char GetTileByPosition(Vector2 position);
+
+        // collisions
+        Texture GetTileByPosition(Vector2 position);
+        std::vector<Vector2> CheckCollisions(Vector2 position);
     };
 }
 

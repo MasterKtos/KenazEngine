@@ -24,6 +24,7 @@ namespace KenazEngine {
         void SetTexture(Texture* newTexture);
         void Show();
         void Move();
+        void OnCircleCollide(Vector2 pos);
 
         Vector2 GetPosition();
     };
