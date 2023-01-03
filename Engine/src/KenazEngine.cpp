@@ -113,4 +113,8 @@ namespace KenazEngine {
     std::shared_ptr<Overlay> KenazEngine::CreateOverlay() {
         return std::make_shared<Overlay>(Renderer, camera);
     }
+
+    std::shared_ptr<Indicator> KenazEngine::CreateIndicator() {
+        return std::make_shared<Indicator>(Renderer, camera);
+    }
 }

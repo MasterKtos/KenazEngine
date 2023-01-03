@@ -16,7 +16,9 @@ int GameLoop(KenazEngine::KenazEngine &Kenaz,
              KenazEngine::Player &fren,
              KenazEngine::Map &map,
              Vector2 target,
-             std::vector<std::shared_ptr<KenazEngine::Overlay>> countdown);
+             std::vector<std::shared_ptr<KenazEngine::Overlay>> countdown,
+             const std::shared_ptr<Indicator>& indicatorPlayer,
+             const std::shared_ptr<Indicator>& indicatorFren);
 int LoadMapTextures(KenazEngine::KenazEngine Kenaz,
                     KenazEngine::Map &map);
 
@@ -24,7 +26,6 @@ int LoadMapTextures(KenazEngine::KenazEngine Kenaz,
 int main(int argc, char *argv[]) {
     Vector2 screenSize(1024, 768);
     Vector2 screenCentre(screenSize.x/2, screenSize.y/2);
-    Vector2 target(0, 0);
     int tileSize = 32;
     int gameRounds = 3;
 
@@ -53,9 +54,6 @@ int main(int argc, char *argv[]) {
     KenazEngine::Texture* targetTexture = Kenaz.CreateTexture();
     targetTexture->Load("circle.png");
 
-    KenazEngine::Texture*  indicatorTex = Kenaz.CreateTexture();
-    indicatorTex->Load("indicator.png");
-
     KenazEngine::Texture* playerTexture = Kenaz.CreateTexture();
     playerTexture->Load("square.png");
     playerTexture->Resize(tileSize, tileSize);
@@ -74,8 +72,12 @@ int main(int argc, char *argv[]) {
     fren.SetTexture(frenTexture);
     fren.lerp = 0.2f;
 
-    Indicator indicator(nullptr, nullptr);
-    indicator = indicatorTex->GetCopy();
+    std::shared_ptr<Indicator> indicatorPlayer = Kenaz.CreateIndicator();
+    indicatorPlayer->Load("indicator-blue.png");
+    indicatorPlayer->MoveTo(player.GetPosition());
+    std::shared_ptr<Indicator> indicatorFren = Kenaz.CreateIndicator();
+    indicatorFren->Load("indicator-orange.png");
+    indicatorFren->MoveTo(fren.GetPosition());
 
     // Load map
     // --------
@@ -87,13 +89,15 @@ int main(int argc, char *argv[]) {
     do {
         map.LoadMap(std::string ("../../map"+std::to_string(i)+".txt").c_str());
         score += GameLoop(Kenaz, player, fren,
-                          map, map.GetTarget(),
-                          countdown);
+                          map, map.GetTarget(), countdown,
+                          indicatorPlayer, indicatorFren);
 
         // Reset players
         // -------------
         playerTexture->MoveTo(400, 300);
         frenTexture->MoveTo(500, 400);
+        indicatorPlayer->MoveTo(player.GetPosition());
+        indicatorFren->MoveTo(fren.GetPosition());
         i++;
     } while(i <= gameRounds);
 
@@ -109,9 +113,13 @@ int GameLoop(KenazEngine::KenazEngine &Kenaz,
              KenazEngine::Player &fren,
              KenazEngine::Map &map,
              Vector2 target,
-             std::vector<std::shared_ptr<KenazEngine::Overlay>> countdown) {
+             std::vector<std::shared_ptr<KenazEngine::Overlay>> countdown,
+             const std::shared_ptr<Indicator>& indicatorPlayer,
+             const std::shared_ptr<Indicator>& indicatorFren) {
     SDL_Event event;
     int startTicks = SDL_GetTicks();
+    indicatorPlayer->target = target;
+    indicatorFren->target = target;
 
     for (int i=0;;i++) {
         Kenaz.UpdateBegin();
@@ -169,12 +177,17 @@ int GameLoop(KenazEngine::KenazEngine &Kenaz,
         player.Show();
         fren.Show();
         countdown[currentTime]->Show();
+        indicatorPlayer->Show();
+        indicatorFren->Show();
 
 
         // Apply movement
         // --------------
         player.Move();
         fren.Move();
+
+        indicatorPlayer->MoveTo(player.GetPosition());
+        indicatorFren->MoveTo(fren.GetPosition());
 
         // Check collisions
         // ----------------
