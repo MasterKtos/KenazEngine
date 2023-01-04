@@ -18,11 +18,12 @@ void KenazEngine::Map::LoadMap(const char* filePath) {
 }
 
 void KenazEngine::Map::FileToMap(std::fstream &mapfile) {
+    map.clear();
     int lineCount = 1;
     std::string lineString;
 
     while (getline(mapfile, lineString)) {
-        map.emplace_back(std::vector<KenazEngine::Texture>());
+        map.emplace_back();
         int position = 1;
         for (char znak: lineString) {
             Texture targetTexture(nullptr, nullptr);
@@ -92,12 +93,14 @@ KenazEngine::Texture KenazEngine::Map::GetTileByPosition(Vector2 position) {
     //printf("Position to index mapping: [%d, %d]; Player position: %s",
     //       (int)position.x/tileSize, (int)position.y/tileSize, position.toString().c_str());
     Vector2 index((int)position.y/tileSize - 1, (int)position.x/tileSize - 2);
+    if(index.x >= map.size()) return Texture(nullptr, nullptr);
+    if(index.y >= map[index.y].size()) return Texture(nullptr, nullptr);
     Texture tile = map[index.x][index.y];
     //tile.Resize({2, 2});
     return tile;
 }
 
-std::vector<Vector2> KenazEngine::Map::CheckCollisions(Vector2 position) {
+std::vector<Vector2> KenazEngine::Map::CheckCollisions(Vector2 position, float radius) {
     // Player position but centered on the nearest tile
     // ------------------------------------------------
     Vector2 remainder((int)position.x%tileSize, (int)position.y%tileSize);
@@ -128,7 +131,7 @@ std::vector<Vector2> KenazEngine::Map::CheckCollisions(Vector2 position) {
     for (auto tilePos : tilePositions) {
         // Player is not "standing" on tile
         // --------------------------------
-        if(position.Distance(tilePos) >= tileSize*1.1f) continue;
+        if(position.Distance(tilePos) >= (tileSize/2 + radius/2)*1.1f) continue;
 
         // Get tile at position and check if it's not empty
         // ------------------------------------------------

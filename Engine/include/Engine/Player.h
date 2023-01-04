@@ -28,6 +28,7 @@ namespace KenazEngine {
         void OnBoxCollide(Vector2 pos);
 
         Vector2 GetPosition();
+        float GetSize();
     };
 }
 

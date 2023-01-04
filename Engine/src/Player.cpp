@@ -66,6 +66,10 @@ void KenazEngine::Player::OnBoxCollide(Vector2 pos) {
     currentSpeed -= currentSpeed * 1.1f;
 }
 
+float KenazEngine::Player::GetSize() {
+    return texture->GetScale();
+}
+
 //Vector2 KenazEngine::Player::GetCollisionDirection(Vector2 pos) {
 //    Vector2 diff = texture->GetPosition() - pos;
 //    diff = abs(diff.x) > abs(diff.y) ? Vector2(1, 0) : Vector2(0, 1);

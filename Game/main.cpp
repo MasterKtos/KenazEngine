@@ -52,16 +52,16 @@ int main(int argc, char *argv[]) {
     // Load textures
     // -------------
     KenazEngine::Texture* targetTexture = Kenaz.CreateTexture();
-    targetTexture->Load("circle.png");
+    targetTexture->Load("guinea_pig.png");
 
     KenazEngine::Texture* playerTexture = Kenaz.CreateTexture();
     playerTexture->Load("square.png");
-    playerTexture->Resize(tileSize, tileSize);
+    playerTexture->Resize(tileSize/4 * 3, tileSize/4 * 3);
     playerTexture->MoveTo(400, 300);
 
     KenazEngine::Texture* frenTexture = Kenaz.CreateTexture();
     frenTexture->Load("circle.png");
-    frenTexture->Resize(tileSize, tileSize);
+    frenTexture->Resize(tileSize/4 * 3, tileSize/4 * 3);
     frenTexture->MoveTo(500, 400);
 
     // Set up players
@@ -87,17 +87,27 @@ int main(int argc, char *argv[]) {
 
     int i = 1, score = 0;
     do {
+        // Set up players
+        // --------------
+        if(i == 1) {
+            playerTexture->MoveTo(7*tileSize, 2*tileSize);
+            frenTexture->MoveTo(27*tileSize, 4*tileSize);
+        }
+        else if(i == 2) {
+            playerTexture->MoveTo(12*tileSize, 2*tileSize);
+            frenTexture->MoveTo(14*tileSize, 2*tileSize);
+        }
+        else if(i == 3) {
+            playerTexture->MoveTo(5*tileSize, 6*tileSize);
+            frenTexture->MoveTo(43*tileSize, 10*tileSize);
+        }
+        indicatorPlayer->MoveTo(player.GetPosition());
+        indicatorFren->MoveTo(fren.GetPosition());
+
         map.LoadMap(std::string ("../../map"+std::to_string(i)+".txt").c_str());
         score += GameLoop(Kenaz, player, fren,
                           map, map.GetTarget(), countdown,
                           indicatorPlayer, indicatorFren);
-
-        // Reset players
-        // -------------
-        playerTexture->MoveTo(400, 300);
-        frenTexture->MoveTo(500, 400);
-        indicatorPlayer->MoveTo(player.GetPosition());
-        indicatorFren->MoveTo(fren.GetPosition());
         i++;
     } while(i <= gameRounds);
 
@@ -191,11 +201,11 @@ int GameLoop(KenazEngine::KenazEngine &Kenaz,
 
         // Check collisions
         // ----------------
-        for(auto collision : map.CheckCollisions(player.GetPosition())) {
+        for(auto collision : map.CheckCollisions(player.GetPosition(), player.GetSize())) {
             player.OnBoxCollide(collision);
         }
 
-        for(auto collision : map.CheckCollisions(fren.GetPosition())) {
+        for(auto collision : map.CheckCollisions(fren.GetPosition(), fren.GetSize())) {
             fren.OnCircleCollide(collision);
         }
 

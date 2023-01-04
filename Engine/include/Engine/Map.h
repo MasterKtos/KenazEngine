@@ -41,7 +41,7 @@ namespace KenazEngine {
 
         // collisions
         Texture GetTileByPosition(Vector2 position);
-        std::vector<Vector2> CheckCollisions(Vector2 position);
+        std::vector<Vector2> CheckCollisions(Vector2 position, float radius);
     };
 }
 

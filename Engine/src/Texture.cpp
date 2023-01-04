@@ -102,4 +102,8 @@ namespace KenazEngine {
     bool Texture::isValid() {
         return (GameRenderer != nullptr || camera != nullptr || Image != nullptr);
     }
+
+    float Texture::GetScale() {
+        return Size.x;
+    }
 }
