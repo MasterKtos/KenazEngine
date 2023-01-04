@@ -25,6 +25,7 @@ namespace KenazEngine {
         void Show();
         void Move();
         void OnCircleCollide(Vector2 pos);
+        void OnBoxCollide(Vector2 pos);
 
         Vector2 GetPosition();
     };

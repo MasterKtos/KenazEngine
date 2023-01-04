@@ -192,7 +192,7 @@ int GameLoop(KenazEngine::KenazEngine &Kenaz,
         // Check collisions
         // ----------------
         for(auto collision : map.CheckCollisions(player.GetPosition())) {
-            player.OnCircleCollide(collision);
+            player.OnBoxCollide(collision);
         }
 
         for(auto collision : map.CheckCollisions(fren.GetPosition())) {
