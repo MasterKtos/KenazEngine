@@ -42,7 +42,9 @@ namespace KenazEngine {
         // TODO: replace with something better
         Texture GetCopy();
         void SetImage(SDL_Texture* image);
+
         Vector2 GetPosition();
+        float GetScale();
 
         bool operator==(const Texture& texture);
         bool isValid();
