@@ -14,7 +14,6 @@
 int LoadMapTextures(KenazEngine::KenazEngine Kenaz,
                     KenazEngine::Map &map);
 
-
 int main(int argc, char *argv[]) {
     Vector2 screenSize(1024, 768);
     Vector2 screenCentre(screenSize.x/2, screenSize.y/2);
@@ -34,18 +33,16 @@ int main(int argc, char *argv[]) {
     KenazEngine::Texture* playerTexture = Kenaz.CreateTexture();
     playerTexture->Load("square.png");
     playerTexture->Resize(tileSize/4 * 3, tileSize/4 * 3);
-    playerTexture->MoveTo(400, 300);
 
     KenazEngine::Texture* frenTexture = Kenaz.CreateTexture();
     frenTexture->Load("circle.png");
     frenTexture->Resize(tileSize/4 * 3, tileSize/4 * 3);
-    frenTexture->MoveTo(500, 400);
 
     // Set up players
     // --------------
     KenazEngine::Player player;
     player.SetTexture(playerTexture);
-    player.lerp = 0.2f;
+    player.speedLerp = 0.2f;
 
     // Load map
     // --------
@@ -53,14 +50,21 @@ int main(int argc, char *argv[]) {
     LoadMapTextures(Kenaz, map);
     map.LoadMap(std::string ("../../platformer.txt").c_str());
 
-    playerTexture->MoveTo(7*tileSize, 2*tileSize);
+    // Set up players on scene
+    // -----------------------
+    playerTexture->MoveTo(7*tileSize, -2*tileSize);
+
+    // Add gravity
+    // -----------
+    player.speed.y = 9.81f;
 
     SDL_Event event;
-    int startTicks = SDL_GetTicks();
 
     for (int i=0;;i++) {
         Kenaz.UpdateBegin();
 
+        // Process input
+        // -------------
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                 return Kenaz.Quit();
@@ -68,8 +72,8 @@ int main(int argc, char *argv[]) {
             if(event.type == SDL_KEYDOWN) {
                 switch(event.key.keysym.sym) {
                     // player 1
-                    case SDLK_UP: player.speed.y = -5; break;
-                    case SDLK_DOWN: player.speed.y = 5; break;
+                    //case SDLK_UP: player.speed.y = -5; break;
+                    //case SDLK_DOWN: player.speed.y = 5; break;
                     case SDLK_LEFT: player.speed.x = -5; break;
                     case SDLK_RIGHT: player.speed.x = 5; break;
                 }
@@ -80,8 +84,8 @@ int main(int argc, char *argv[]) {
                     //TODO: delet
                     case SDLK_ESCAPE: return Kenaz.Quit(); break;
                         // player 1
-                    case SDLK_UP:
-                    case SDLK_DOWN: player.speed.y = 0; break;
+                    //case SDLK_UP:
+                    //case SDLK_DOWN: player.speed.y = 0; break;
                     case SDLK_LEFT:
                     case SDLK_RIGHT: player.speed.x = 0; break;
                 }
@@ -95,16 +99,19 @@ int main(int argc, char *argv[]) {
         map.Show();
         player.Show();
 
+        // Check collisions
+        // ----------------
+        auto collisions = map.CheckCollisions(player.GetPosition(), player.GetSize());
+        for(auto collision : collisions) {
+            player.OnBoxCollide(collision, tileSize/2);
+        }
+        // Clear collision vector if there are no collisions
+        if(collisions.empty()) player.OnBoxCollide(Vector2(0, 0), tileSize/2);
 
         // Apply movement
         // --------------
         player.Move();
 
-        // Check collisions
-        // ----------------
-        for(auto collision : map.CheckCollisions(player.GetPosition(), player.GetSize())) {
-            player.OnBoxCollide(collision);
-        }
 
         // Move camera
         // -----------

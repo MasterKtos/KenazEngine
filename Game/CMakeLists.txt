@@ -7,7 +7,15 @@ if(UNIX)
 endif()
 
 # Create the executable
-add_executable(${PROJECT_NAME} main.cpp Scenes/game.cpp Scripts/src/Ball.cpp Scripts/Ball.h Scripts/src/BallManager.cpp Scripts/BallManager.h Scenes/balls_bouncing.cpp Scripts/src/Maze.cpp Scripts/Maze.h Scripts/src/Indicator.cpp Scripts/Indicator.h Scenes/maze_level.cpp)
+add_executable(${PROJECT_NAME} main.cpp
+        Scripts/src/Ball.cpp Scripts/Ball.h
+        Scripts/src/BallManager.cpp Scripts/BallManager.h
+        Scripts/src/Maze.cpp Scripts/Maze.h
+        Scripts/src/Indicator.cpp Scripts/Indicator.h
+#        Scenes/game.cpp
+#        Scenes/balls_bouncing.cpp
+#        Scenes/maze_level.cpp
+        )
 
 
 # Link the static library from subproject1 using its alias sub::lib1

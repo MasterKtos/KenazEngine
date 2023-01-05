@@ -22,6 +22,17 @@ public:
         return std::sqrt((x - pos.x) * (x - pos.x) + (y - pos.y) * (y - pos.y));
     }
 
+    Vector2 Clamp(float max) {
+        x = x>max ? max : x < -max ? -max : x;
+        y = y>max ? max : y < -max ? -max : y;
+        return *this;
+    }
+
+    void Mask(Vector2 maskVector) {
+        x = maskVector.x == 0 ? 0 : x;
+        y = maskVector.y == 0 ? 0 : y;
+    }
+
     std::string toString() const {
         return "["+std::to_string((int)x)+", "+std::to_string((int)y)+"]";
     }
@@ -69,6 +80,10 @@ public:
 
     void operator-=(Vector2 other) {
         x -= other.x; y -= other.y;
+    }
+
+    void operator+=(Vector2 other) {
+        x += other.x; y += other.y;
     }
 
     // Negation

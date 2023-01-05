@@ -66,9 +66,9 @@ int run() {
     // --------------
     KenazEngine::Player player, fren;
     player.SetTexture(playerTexture);
-    player.lerp = 0.2f;
+    player.speedLerp = 0.2f;
     fren.SetTexture(frenTexture);
-    fren.lerp = 0.2f;
+    fren.speedLerp = 0.2f;
 
     std::shared_ptr<Indicator> indicatorPlayer = Kenaz.CreateIndicator();
     indicatorPlayer->Load("indicator-blue.png");
