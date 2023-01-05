@@ -93,8 +93,8 @@ KenazEngine::Texture KenazEngine::Map::GetTileByPosition(Vector2 position) {
     //printf("Position to index mapping: [%d, %d]; Player position: %s",
     //       (int)position.x/tileSize, (int)position.y/tileSize, position.toString().c_str());
     Vector2 index((int)position.y/tileSize - 1, (int)position.x/tileSize - 2);
-    if(index.x >= map.size()) return Texture(nullptr, nullptr);
-    if(index.y >= map[index.y].size()) return Texture(nullptr, nullptr);
+    if(index.x >= map.size()-1 || index.x < 0 || map[index.x].empty() ||
+       index.y >= map[index.x].size()-1 || index.y < 0) return Texture(nullptr, nullptr);
     Texture tile = map[index.x][index.y];
     //tile.Resize({2, 2});
     return tile;
