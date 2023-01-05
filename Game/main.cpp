@@ -102,11 +102,9 @@ int main(int argc, char *argv[]) {
         // Check collisions
         // ----------------
         auto collisions = map.CheckCollisions(player.GetPosition(), player.GetSize());
-        for(auto collision : collisions) {
-            player.OnBoxCollide(collision, tileSize/2);
-        }
+        player.AnalyzeCollisions(collisions, tileSize/2);
         // Clear collision vector if there are no collisions
-        if(collisions.empty()) player.OnBoxCollide(Vector2(0, 0), tileSize/2);
+        //if(collisions.empty()) player.OnBoxCollide(Vector2(0, 0), tileSize/2);
 
         // Apply movement
         // --------------

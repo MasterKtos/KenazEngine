@@ -3,6 +3,7 @@
 //
 
 #include <vector>
+#include <unordered_map>
 #include "Engine/Player.h"
 
 KenazEngine::Player::Player() : currentSpeed(0), speed(0), speedLerp(1) {}
@@ -42,8 +43,6 @@ void KenazEngine::Player::OnCircleCollide(Vector2 pos) {
 }
 
 void KenazEngine::Player::OnBoxCollide(Vector2 pos, float otherRadius) {
-    if(pos == Vector2(0)) { collisionVector = pos; return; }
-
     Vector2 position = texture->GetPosition();
     float distance = position.Distance(pos);
     Vector2 normalVector = (position - pos)/distance;
@@ -61,12 +60,19 @@ void KenazEngine::Player::OnBoxCollide(Vector2 pos, float otherRadius) {
     collisionVector.Clamp(1);
 }
 
-Vector2 KenazEngine::Player::GetPosition() { return texture->GetPosition(); }
-float KenazEngine::Player::GetSize() { return texture->GetScale(); }
+void KenazEngine::Player::AnalyzeCollisions(
+        const std::vector<Vector2>& collisions,
+        float otherRadius) {
+    // Reset collision vector if there are no collisions
+    // -------------------------------------------------
+    if(collisions.empty()) { collisionVector = Vector2(0); return; }
+    printf("ENTER");
 
-void KenazEngine::Player::AnalyzeCollisions(const std::vector<Vector2>& collisions) {
     Vector2 position = GetPosition();
-    std::vector<std::pair<Vector2, Direction>> categorizedCollisions;
+    // Used to divide area around player to 8 parts
+    // --------------------------------------------
+    float regionSize = GetSize()/2;
+    std::unordered_map<Direction, Vector2> categorizedCollisions;
     // Categorize collisions
     // ---------------------
     for( auto collision : collisions) {
@@ -78,15 +84,74 @@ void KenazEngine::Player::AnalyzeCollisions(const std::vector<Vector2>& collisio
         // ----------------------------------------------
         if(diff.x * speed.x < 0 || diff.y * speed.y < 0) continue;
 
-        // UP
-        if(diff.y >= 0) {
-            // LEFT
-            if(diff.x >= 0) {
-                //categorizedCollisions.push_back({collision, Direction::})
-            }
+        // Division looks like such:
+        //
+        //  NW \ N / NE  } regionSize/2
+        //  W >  x  < E  } regionSize
+        //  SW / S \ SE  } regionSize/2
+
+        // N
+        Direction direction;
+        if(diff.y >= regionSize/2) {
+            if     (diff.x > regionSize/2) direction = Direction::NW;
+            else if(diff.x < regionSize/2) direction = Direction::NE;
+            else                           direction = Direction::N;
         }
+        // S
+        else if(diff.y <= regionSize/2) {
+            if     (diff.x > regionSize/2) direction = Direction::SW;
+            else if(diff.x < regionSize/2) direction = Direction::SE;
+            else                           direction = Direction::S;
+        }
+        // E/W
+        else {
+            if(diff.x > 0) direction = Direction::W;
+            else           direction = Direction::E;
+        }
+        categorizedCollisions.insert({direction, collision});
+    }
+
+    // if there's collision up, down, left or right,
+    //  adjanced corner collisions are irrevelant
+    // ---------------------------------------------
+    if(categorizedCollisions.find(Direction::N) != categorizedCollisions.end())
+    {
+        if(categorizedCollisions.find(Direction::NE) != categorizedCollisions.end())
+            categorizedCollisions.erase(Direction::NE);
+        if(categorizedCollisions.find(Direction::NW) != categorizedCollisions.end())
+            categorizedCollisions.erase(Direction::NW);
+    }
+    // there cannot be opposing directions present, hence "else"
+    else if(categorizedCollisions.find(Direction::S) != categorizedCollisions.end())
+    {
+        if(categorizedCollisions.find(Direction::SE) != categorizedCollisions.end())
+            categorizedCollisions.erase(Direction::SE);
+        if(categorizedCollisions.find(Direction::SW) != categorizedCollisions.end())
+            categorizedCollisions.erase(Direction::SW);
+    }
+    // Do the same for the sides
+    if(categorizedCollisions.find(Direction::E) != categorizedCollisions.end())
+    {
+        if(categorizedCollisions.find(Direction::NE) != categorizedCollisions.end())
+            categorizedCollisions.erase(Direction::NE);
+        if(categorizedCollisions.find(Direction::SE) != categorizedCollisions.end())
+            categorizedCollisions.erase(Direction::SE);
+    }
+    else if(categorizedCollisions.find(Direction::W) != categorizedCollisions.end())
+    {
+        if(categorizedCollisions.find(Direction::NW) != categorizedCollisions.end())
+            categorizedCollisions.erase(Direction::NW);
+        if(categorizedCollisions.find(Direction::SW) != categorizedCollisions.end())
+            categorizedCollisions.erase(Direction::SW);
+    }
+
+    for(auto catCollision : categorizedCollisions) {
+        OnBoxCollide(catCollision.second, otherRadius);
     }
 }
+
+Vector2 KenazEngine::Player::GetPosition() { return texture->GetPosition(); }
+float KenazEngine::Player::GetSize() { return texture->GetScale(); }
 
 //Vector2 KenazEngine::Player::GetCollisionDirection(Vector2 pos) {
 //    Vector2 diff = texture->GetPosition() - pos;

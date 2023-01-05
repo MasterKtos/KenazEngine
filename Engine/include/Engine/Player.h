@@ -40,7 +40,9 @@ namespace KenazEngine {
         void OnCircleCollide(Vector2 pos);
         void OnBoxCollide(Vector2 pos, float otherRadius);
 
-        void AnalyzeCollisions(const std::vector<Vector2>& collisions);
+        void AnalyzeCollisions(
+                const std::vector<Vector2>& collisions,
+                float otherRadius);
 
         Vector2 GetPosition();
         float GetSize();
