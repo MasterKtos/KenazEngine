@@ -17,6 +17,13 @@ enum class Direction {
     S, SW, W, NW
 };
 
+struct DirectionMask {
+    bool N = false, NE = false,
+         E = false, SE = false,
+         S = false, SW = false,
+         W = false, NW = false;
+};
+
 namespace KenazEngine {
     class Player {
     private:

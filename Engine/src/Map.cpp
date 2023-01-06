@@ -103,35 +103,27 @@ KenazEngine::Texture KenazEngine::Map::GetTileByPosition(Vector2 position) {
 std::vector<Vector2> KenazEngine::Map::CheckCollisions(Vector2 position, float radius) {
     // Player position but centered on the nearest tile
     // ------------------------------------------------
-    Vector2 remainder((int)position.x%tileSize, (int)position.y%tileSize);
-    Vector2 nPosition = {
-            remainder.x>=tileSize/2 ? position.x + (tileSize - remainder.x) : position.x - remainder.x,
-            remainder.y>=tileSize/2 ? position.y + (tileSize - remainder.y) : position.y - remainder.y
-    };
-    //printf("[[ remainder: %s || normalized pos: %s ]]",
-    //       remainder.toString().c_str(), nPosition.toString().c_str());
+    Vector2 posRemainder((int)position.x % tileSize, (int)position.y % tileSize);
 
-    // Tiles around player
-    // -------------------
-    //                                N
-    //                              W   E
-    //                                s
+    // New concept: player's position is ether between tiles, or perfectly on tile
+    // so realistically we need to retrieve just about 4 tiles
+    // ---------------------------------------------------------------------------
+    //                                            N
+    //                                          W   E
+    //                                            S
+    //
     std::vector<Vector2> tilePositions = {
-            { nPosition.x, nPosition.y - tileSize },              //  N
-            { nPosition.x + tileSize, nPosition.y - tileSize },   //  NE
-            { nPosition.x + tileSize, nPosition.y },              //   E
-            { nPosition.x + tileSize, nPosition.y + tileSize },   //  SE
-            { nPosition.x, nPosition.y + tileSize },              //  S
-            { nPosition.x - tileSize, nPosition.y + tileSize },   // WS
-            { nPosition.x - tileSize, nPosition.y },              // W
-            { nPosition.x - tileSize, nPosition.y - tileSize }    // WN
+        {position.x + tileSize - posRemainder.x, position.y - posRemainder.y },            //  NE
+        {position.x + tileSize - posRemainder.x, position.y + tileSize - posRemainder.y }, //  SE
+        {position.x - posRemainder.x, position.y + tileSize - posRemainder.y },            // WS
+        {position.x - posRemainder.x, position.y - posRemainder.y },                       // WN
     };
     std::vector<Vector2> collisions;
 
     for (auto tilePos : tilePositions) {
         // Player is not "standing" on tile
         // --------------------------------
-        if(position.Distance(tilePos) >= (tileSize/2 + radius/2)*1.1f) continue;
+        //if(position.Distance(tilePos) >= (tileSize/2 + radius/2)*1.41f) continue;
 
         // Get tile at position and check if it's not empty
         // ------------------------------------------------

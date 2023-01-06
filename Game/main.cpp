@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
 
     // Add gravity
     // -----------
-    player.speed.y = 9.81f;
+    //player.speed.y = 9.81f;
 
     SDL_Event event;
 
@@ -72,8 +72,8 @@ int main(int argc, char *argv[]) {
             if(event.type == SDL_KEYDOWN) {
                 switch(event.key.keysym.sym) {
                     // player 1
-                    //case SDLK_UP: player.speed.y = -5; break;
-                    //case SDLK_DOWN: player.speed.y = 5; break;
+                    case SDLK_UP: player.speed.y = -5; break;
+                    case SDLK_DOWN: player.speed.y = 5; break;
                     case SDLK_LEFT: player.speed.x = -5; break;
                     case SDLK_RIGHT: player.speed.x = 5; break;
                 }
@@ -84,8 +84,8 @@ int main(int argc, char *argv[]) {
                     //TODO: delet
                     case SDLK_ESCAPE: return Kenaz.Quit(); break;
                         // player 1
-                    //case SDLK_UP:
-                    //case SDLK_DOWN: player.speed.y = 0; break;
+                    case SDLK_UP:
+                    case SDLK_DOWN: player.speed.y = 0; break;
                     case SDLK_LEFT:
                     case SDLK_RIGHT: player.speed.x = 0; break;
                 }
