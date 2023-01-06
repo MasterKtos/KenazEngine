@@ -18,9 +18,12 @@ void KenazEngine::Player::Move() {
     if(speed != currentSpeed) {
         currentSpeed = Vector2::Lerp(currentSpeed, speed, speedLerp);
     }
-    texture->Move(currentSpeed + currentSpeed * collisionVector);
+    Vector2 speedMasked(
+            collisionVector.x * currentSpeed.x >= 0 ? currentSpeed.x : 0,
+            collisionVector.y * currentSpeed.y >= 0 ? currentSpeed.y : 0);
+    texture->Move(speedMasked);
 
-    //printf("%s\n", collisionVector.toString().c_str());
+    //printf("%s\n", (currentSpeed + currentSpeed * collisionVector).toString().c_str());
 }
 
 void KenazEngine::Player::OnCircleCollide(Vector2 pos) {
@@ -70,7 +73,7 @@ void KenazEngine::Player::AnalyzeCollisions(
     Vector2 position = GetPosition();
     // Used to divide area around player to 8 parts
     // --------------------------------------------
-    float regionSize = GetSize()/2;
+    float regionSize = GetSize();
 
     std::unordered_map<Direction, Vector2> categorizedCollisions;
     DirectionMask dirMask;
@@ -78,6 +81,7 @@ void KenazEngine::Player::AnalyzeCollisions(
     // ---------------------
     for( auto collision : collisions) {
         Vector2 diff = position - collision;
+        printf("%f %s\t", regionSize, diff.toString().c_str());
 
         // Check if collision comes from direction
         //   where player is going ("in front" of player);
@@ -93,16 +97,16 @@ void KenazEngine::Player::AnalyzeCollisions(
 
         // N
         Direction direction;
-        if(diff.y >= regionSize/2) {
-            if     (diff.x >  regionSize/2) { direction = Direction::NW; dirMask.NW = true; }
+        if(diff.y >= regionSize/2 && abs(diff.y)+5 >= abs(diff.x)) {
+            /*if     (diff.x >  regionSize/2) { direction = Direction::NW; dirMask.NW = true; }
             else if(diff.x < -regionSize/2) { direction = Direction::NE; dirMask.NE = true; }
-            else                            { direction = Direction::N; dirMask.N = true; }
+            else*/                            { direction = Direction::N; dirMask.N = true; }
         }
         // S
-        else if(diff.y <= -regionSize/2) {
-            if     (diff.x >  regionSize/2) { direction = Direction::SW; dirMask.SW = true; }
+        else if(diff.y <= -regionSize/2 && abs(diff.y)+5 >= abs(diff.x)) {
+            /*if     (diff.x >  regionSize/2) { direction = Direction::SW; dirMask.SW = true; }
             else if(diff.x < -regionSize/2) { direction = Direction::SE; dirMask.SE = true; }
-            else                            { direction = Direction::S; dirMask.S = true; }
+            else*/                            { direction = Direction::S; dirMask.S = true; }
         }
         // E/W
         else {
@@ -111,85 +115,30 @@ void KenazEngine::Player::AnalyzeCollisions(
         }
         categorizedCollisions.insert({direction, collision});
     }
+    if(dirMask.N)  printf("N ");
+    if(dirMask.NE) printf("NE ");
+    if(dirMask.E)  printf("E ");
+    if(dirMask.SE) printf("SE ");
+    if(dirMask.S)  printf("S ");
+    if(dirMask.SW) printf("SW ");
+    if(dirMask.W)  printf("W ");
+    if(dirMask.NW) printf("NW ");
 
     collisionVector = Vector2(0);
-    if(dirMask.N) {collisionVector.y += 1; printf("N ");}
-    if(dirMask.S) {collisionVector.y -= 1; printf("S ");}
-    if(dirMask.E) {collisionVector.x -= 1;  printf("E ");}
-    if(dirMask.W) {collisionVector.x += 1;  printf("W ");}
+    if(dirMask.N) collisionVector.y += 1;
+    if(dirMask.S) collisionVector.y -= 1;
+    if(dirMask.E) collisionVector.x -= 1;
+    if(dirMask.W) collisionVector.x += 1;
 
-    if(dirMask.NE) {collisionVector += Vector2(-0.5f, 0.5f); printf("NE ");}
-    if(dirMask.SW && !dirMask.S) {collisionVector += Vector2(0.5f, -0.5f); printf("SW ");}
-    if(dirMask.SE && !dirMask.S) {collisionVector += Vector2(-0.5f, -0.5f); printf("SE ");}
-    if(dirMask.NW) {collisionVector += Vector2(0.5f, 0.5f); printf("NW ");}
+    // Edge cases
+    //if(!dirMask.S && !dirMask.E && dirMask.SE) collisionVector.y -=1;
+
+//    if(dirMask.NE) collisionVector += Vector2(-0.5f, 0.5f);
+//    if(dirMask.SW && !dirMask.S) collisionVector += Vector2(0.5f, -0.5f);
+//    if(dirMask.SE && !dirMask.S) collisionVector += Vector2(-0.5f, -0.5f);
+//    if(dirMask.NW) collisionVector += Vector2(0.5f, 0.5f);
 
     printf("\t\t[%f, %f]\n", collisionVector.x, collisionVector.y);
-    return;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    if(categorizedCollisions.find(Direction::N) != categorizedCollisions.end())
-    {
-        if(categorizedCollisions.find(Direction::NE) != categorizedCollisions.end())
-            categorizedCollisions.erase(Direction::NE);
-        if(categorizedCollisions.find(Direction::NW) != categorizedCollisions.end())
-            categorizedCollisions.erase(Direction::NW);
-    }
-    // there cannot be opposing directions present, hence "else"
-    else if(categorizedCollisions.find(Direction::S) != categorizedCollisions.end())
-    {
-        if(categorizedCollisions.find(Direction::SE) != categorizedCollisions.end())
-            categorizedCollisions.erase(Direction::SE);
-        if(categorizedCollisions.find(Direction::SW) != categorizedCollisions.end())
-            categorizedCollisions.erase(Direction::SW);
-    }
-    else collisionVector.y = 0;
-    // Do the same for the sides
-    if(categorizedCollisions.find(Direction::E) != categorizedCollisions.end())
-    {
-        if(categorizedCollisions.find(Direction::NE) != categorizedCollisions.end())
-            categorizedCollisions.erase(Direction::NE);
-        if(categorizedCollisions.find(Direction::SE) != categorizedCollisions.end())
-            categorizedCollisions.erase(Direction::SE);
-    }
-    else if(categorizedCollisions.find(Direction::W) != categorizedCollisions.end())
-    {
-        if(categorizedCollisions.find(Direction::NW) != categorizedCollisions.end())
-            categorizedCollisions.erase(Direction::NW);
-        if(categorizedCollisions.find(Direction::SW) != categorizedCollisions.end())
-            categorizedCollisions.erase(Direction::SW);
-    }
-    else collisionVector.x = 0;
-
-    // For the case when player is between tiles:
-    //   e.g.: SE && SW = S
-    auto collisionSE = categorizedCollisions.find(Direction::SE);
-    auto collisionSW = categorizedCollisions.find(Direction::SE);
-    if(collisionSE != categorizedCollisions.end() && collisionSW != categorizedCollisions.end()) {
-        categorizedCollisions.insert({Direction::S, Vector2::MiddlePoint(
-                collisionSE->second,collisionSW->second)});
-        categorizedCollisions.erase(Direction::SE);
-        categorizedCollisions.erase(Direction::SW);
-    }
-
-
-    for(auto catCollision : categorizedCollisions) {
-        OnBoxCollide(catCollision.second, otherRadius);
-    }
 }
 
 Vector2 KenazEngine::Player::GetPosition() { return texture->GetPosition(); }
