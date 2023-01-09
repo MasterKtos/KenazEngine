@@ -28,8 +28,11 @@ namespace KenazEngine {
     class Player {
     private:
         Texture* texture;
+
         Vector2 currentSpeed;
         Vector2 collisionVector;
+        float gravityValue = 9.81f;
+        float jumpForce = -gravityValue * 5;
 
     public:
         Vector2 speed;

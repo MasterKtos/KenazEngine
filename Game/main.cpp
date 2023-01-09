@@ -15,7 +15,7 @@ int LoadMapTextures(KenazEngine::KenazEngine Kenaz,
                     KenazEngine::Map &map);
 
 int main(int argc, char *argv[]) {
-    Vector2 screenSize(1024, 768);
+    Vector2 screenSize(1366, 768);
     Vector2 screenCentre(screenSize.x/2, screenSize.y/2);
     int tileSize = 32;
 
@@ -56,9 +56,10 @@ int main(int argc, char *argv[]) {
 
     // Add gravity
     // -----------
-    //player.speed.y = 9.81f;
+    player.speed.y = 9.81f;
 
     SDL_Event event;
+
 
     for (int i=0;;i++) {
         Kenaz.UpdateBegin();
@@ -71,21 +72,29 @@ int main(int argc, char *argv[]) {
             }
             if(event.type == SDL_KEYDOWN) {
                 switch(event.key.keysym.sym) {
-                    // player 1
-                    case SDLK_UP: player.speed.y = -5; break;
-                    case SDLK_DOWN: player.speed.y = 5; break;
+                    // Player 1
+                    // --------
+                    // Speed
+                    //case SDLK_UP: player.speed.y = -5; break;
+                    //case SDLK_DOWN: player.speed.y = 5; break;
                     case SDLK_LEFT: player.speed.x = -5; break;
                     case SDLK_RIGHT: player.speed.x = 5; break;
+                        // Functions
+                    case /*SPACE*/32: player.Jump(); break;
+
+                    // Other
+                    // -----
+                    case SDLK_ESCAPE: return Kenaz.Quit(); break;
                 }
-                //printf("KEYDOWN | %d \n", event.key.keysym.sym);
+                printf("KEYDOWN | ]%d[ \n", event.key.keysym.sym);
             }
             if(event.type == SDL_KEYUP) {
                 switch(event.key.keysym.sym) {
-                    //TODO: delet
-                    case SDLK_ESCAPE: return Kenaz.Quit(); break;
-                        // player 1
-                    case SDLK_UP:
-                    case SDLK_DOWN: player.speed.y = 0; break;
+                    // Player 1
+                    // --------
+                    // Speed
+                    //case SDLK_UP:
+                    //case SDLK_DOWN: player.speed.y = 0; break;
                     case SDLK_LEFT:
                     case SDLK_RIGHT: player.speed.x = 0; break;
                 }

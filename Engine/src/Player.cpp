@@ -14,17 +14,23 @@ void KenazEngine::Player::Show() { if(texture) texture->Show(); }
 
 void KenazEngine::Player::Move() {
     if(!texture) return;
+    printf("%[%f, %f]\n", currentSpeed.x, currentSpeed.y);
 
     if(speed != currentSpeed) {
         currentSpeed = Vector2::Lerp(currentSpeed, speed, speedLerp);
     }
-    Vector2 speedMasked(
-            collisionVector.x * currentSpeed.x >= 0 ? currentSpeed.x : 0,
-            collisionVector.y * currentSpeed.y >= 0 ? currentSpeed.y : 0);
-    texture->Move(speedMasked);
+    texture->Move(currentSpeed + currentSpeed*collisionVector);
 
     //printf("%s\n", (currentSpeed + currentSpeed * collisionVector).toString().c_str());
 }
+
+void KenazEngine::Player::Jump() {
+    currentSpeed.y = jumpForce;
+}
+
+// ==========
+// Collisions
+// ==========
 
 void KenazEngine::Player::OnCircleCollide(Vector2 pos) {
     Vector2 position = texture->GetPosition();
@@ -71,9 +77,6 @@ void KenazEngine::Player::AnalyzeCollisions(
     if(collisions.empty()) { collisionVector = Vector2(0); return; }
 
     Vector2 position = GetPosition();
-    // Used to divide area around player to 8 parts
-    // --------------------------------------------
-    float regionSize = GetSize();
 
     std::unordered_map<Direction, Vector2> categorizedCollisions;
     DirectionMask dirMask;
@@ -81,14 +84,12 @@ void KenazEngine::Player::AnalyzeCollisions(
     // ---------------------
     for( auto collision : collisions) {
         Vector2 diff = position - collision;
-        printf("%f %s\t", regionSize, diff.toString().c_str());
+        // printf("%f %s\t", regionSize, diff.toString().c_str());
 
-        // Check if collision comes from direction
-        //   where player is going ("in front" of player);
-        // If so, skip checking such
-        // ----------------------------------------------
-        //if(diff.x * speed.x < 0 || diff.y * -speed.y < 0) continue;
-
+        // =================================
+        // BELOW IS OBSOLETE
+        // Now it only divides to N, E, S, W
+        // =================================
         // Division looks like such:
         //
         //  NW \ N / NE  } regionSize/2
@@ -96,33 +97,25 @@ void KenazEngine::Player::AnalyzeCollisions(
         //  SW / S \ SE  } regionSize/2
 
         // N
-        Direction direction;
-        if(diff.y >= regionSize/2 && abs(diff.y)+5 >= abs(diff.x)) {
-            /*if     (diff.x >  regionSize/2) { direction = Direction::NW; dirMask.NW = true; }
-            else if(diff.x < -regionSize/2) { direction = Direction::NE; dirMask.NE = true; }
-            else*/                            { direction = Direction::N; dirMask.N = true; }
-        }
+        if     (diff.y > 0 && abs(diff.y)+5 >= abs(diff.x)) dirMask.N = true;
         // S
-        else if(diff.y <= -regionSize/2 && abs(diff.y)+5 >= abs(diff.x)) {
-            /*if     (diff.x >  regionSize/2) { direction = Direction::SW; dirMask.SW = true; }
-            else if(diff.x < -regionSize/2) { direction = Direction::SE; dirMask.SE = true; }
-            else*/                            { direction = Direction::S; dirMask.S = true; }
-        }
+        else if(diff.y < 0 && abs(diff.y)+5 >= abs(diff.x)) dirMask.S = true;
         // E/W
         else {
-            if(diff.x > 0) { direction = Direction::W; dirMask.W = true; }
-            else           { direction = Direction::E; dirMask.E = true; }
+            if(diff.x > 0) dirMask.W = true;
+            else           dirMask.E = true;
         }
-        categorizedCollisions.insert({direction, collision});
     }
-    if(dirMask.N)  printf("N ");
-    if(dirMask.NE) printf("NE ");
-    if(dirMask.E)  printf("E ");
-    if(dirMask.SE) printf("SE ");
-    if(dirMask.S)  printf("S ");
-    if(dirMask.SW) printf("SW ");
-    if(dirMask.W)  printf("W ");
-    if(dirMask.NW) printf("NW ");
+    #pragma region  Mask print
+    //if(dirMask.N)  printf("N ");
+    //if(dirMask.NE) printf("NE ");
+    //if(dirMask.E)  printf("E ");
+    //if(dirMask.SE) printf("SE ");
+    //if(dirMask.S)  printf("S ");
+    //if(dirMask.SW) printf("SW ");
+    //if(dirMask.W)  printf("W ");
+    //if(dirMask.NW) printf("NW ");
+    #pragma endregion
 
     collisionVector = Vector2(0);
     if(dirMask.N) collisionVector.y += 1;
@@ -130,22 +123,12 @@ void KenazEngine::Player::AnalyzeCollisions(
     if(dirMask.E) collisionVector.x -= 1;
     if(dirMask.W) collisionVector.x += 1;
 
-    // Edge cases
-    //if(!dirMask.S && !dirMask.E && dirMask.SE) collisionVector.y -=1;
+    collisionVector = Vector2(
+            collisionVector.x * currentSpeed.x >= 0 ? 0 : -1,
+            collisionVector.y * currentSpeed.y >= 0 ? 0 : -1);
 
-//    if(dirMask.NE) collisionVector += Vector2(-0.5f, 0.5f);
-//    if(dirMask.SW && !dirMask.S) collisionVector += Vector2(0.5f, -0.5f);
-//    if(dirMask.SE && !dirMask.S) collisionVector += Vector2(-0.5f, -0.5f);
-//    if(dirMask.NW) collisionVector += Vector2(0.5f, 0.5f);
-
-    printf("\t\t[%f, %f]\n", collisionVector.x, collisionVector.y);
+    //printf("\t\t[%f, %f]\n", collisionVector.x, collisionVector.y);
 }
 
 Vector2 KenazEngine::Player::GetPosition() { return texture->GetPosition(); }
 float KenazEngine::Player::GetSize() { return texture->GetScale(); }
-
-//Vector2 KenazEngine::Player::GetCollisionDirection(Vector2 pos) {
-//    Vector2 diff = texture->GetPosition() - pos;
-//    diff = abs(diff.x) > abs(diff.y) ? Vector2(1, 0) : Vector2(0, 1);
-//    return diff;
-//}
