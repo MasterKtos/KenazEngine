@@ -8,8 +8,14 @@
 #include "Vector2.h"
 #include "Texture.h"
 
-struct JumpPhysics {
+class JumpPhysics {
+public:
+    float height;
+    float timeToMax;
 
+    JumpPhysics() : height(10), timeToMax(2) {}
+    float Gravity() { return -2*height/(timeToMax*timeToMax); }
+    float InitialSpeed() { return 2*height/timeToMax; }
 };
 
 enum class Direction {
