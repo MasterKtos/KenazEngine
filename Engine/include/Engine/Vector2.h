@@ -36,6 +36,9 @@ public:
     std::string toString() const {
         return "["+std::to_string((int)x)+", "+std::to_string((int)y)+"]";
     }
+    std::string toStringf() const {
+        return "["+std::to_string(x)+", "+std::to_string(y)+"]";
+    }
 
     static Vector2 Lerp(Vector2 position, Vector2 destination, float lerpValue) {
         return {

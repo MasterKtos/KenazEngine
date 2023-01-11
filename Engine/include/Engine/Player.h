@@ -13,9 +13,12 @@ public:
     float height;
     float timeToMax;
 
-    JumpPhysics() : height(10), timeToMax(2) {}
+    JumpPhysics() : height(5), timeToMax(0.5f) {}
     float Gravity() { return -2*height/(timeToMax*timeToMax); }
     float InitialSpeed() { return 2*height/timeToMax; }
+    float GetPositionChange(float deltaTime) {
+        return 0.5f * Gravity() * deltaTime * deltaTime;
+    }
 };
 
 enum class Direction {
@@ -35,14 +38,19 @@ namespace KenazEngine {
     private:
         Texture* texture;
 
-        Vector2 currentSpeed;
         Vector2 collisionVector;
-        float gravityValue = 9.81f;
-        float jumpForce = -gravityValue * 5;
+        int jumpCount;
+
+        void OnLanded();
 
     public:
+        Vector2 posDelta;
+        Vector2 currentSpeed;
         Vector2 speed;
         bool applyGravity;
+        bool landed = false;
+        JumpPhysics jumpPhysics;
+        int maxJumpCount;
         ///\note
         /// Value range: \<0, 1>  0 - max lerp, 1 - no lerp
         float speedLerp;
@@ -51,7 +59,7 @@ namespace KenazEngine {
 
         void SetTexture(Texture* newTexture);
         void Show();
-        void Move();
+        void Move(float deltaTime);
         void Jump();
         void OnCircleCollide(Vector2 pos);
         void OnBoxCollide(Vector2 pos, float otherRadius);

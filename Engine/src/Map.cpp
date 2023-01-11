@@ -54,8 +54,8 @@ void KenazEngine::Map::Show() {
 }
 
 void KenazEngine::Map::Move(int x, int y) {
-    for(const auto& line : map) {
-        for(Texture tile : line) {
+    for(auto& line : map) {
+        for(Texture &tile : line) {
             tile.Move(x, y);
         }
     }

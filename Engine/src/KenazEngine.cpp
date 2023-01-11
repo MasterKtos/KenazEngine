@@ -8,6 +8,7 @@
 #include <memory>
 #include <utility>
 #include <iostream>
+#include <chrono>
 
 namespace KenazEngine {
     KenazEngine::KenazEngine() {

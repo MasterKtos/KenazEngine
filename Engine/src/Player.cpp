@@ -6,26 +6,45 @@
 #include <unordered_map>
 #include "Engine/Player.h"
 
-KenazEngine::Player::Player() : currentSpeed(0), speed(0), speedLerp(1) {}
+KenazEngine::Player::Player()
+        : currentSpeed(0), speed(0), speedLerp(1),
+          jumpCount(0), maxJumpCount(1) {}
 
 void KenazEngine::Player::SetTexture(Texture* newTexture) { texture = newTexture; }
 
 void KenazEngine::Player::Show() { if(texture) texture->Show(); }
 
-void KenazEngine::Player::Move() {
+void KenazEngine::Player::Move(float deltaTime) {
     if(!texture) return;
-    printf("%[%f, %f]\n", currentSpeed.x, currentSpeed.y);
 
-    if(speed != currentSpeed) {
-        currentSpeed = Vector2::Lerp(currentSpeed, speed, speedLerp);
+    posDelta = GetPosition();
+
+    // Player landed
+    // -------------
+    if(collisionVector.y >= 0) {
+        speed.y -= jumpPhysics.Gravity() * deltaTime;
     }
-    texture->Move(currentSpeed + currentSpeed*collisionVector);
 
-    //printf("%s\n", (currentSpeed + currentSpeed * collisionVector).toString().c_str());
+    // Lerp only x speed
+    // -----------------
+    if(speed.x != currentSpeed.x) {
+        currentSpeed = Vector2::Lerp(currentSpeed, Vector2(speed.x, currentSpeed.y), speedLerp);
+    }
+
+    texture->Move(currentSpeed + currentSpeed*collisionVector);
+    currentSpeed.y += speed.y * deltaTime + jumpPhysics.GetPositionChange(deltaTime);
+
+//    printf("Speed:\t\t\t%s\n", (speed).toString().c_str());
+    posDelta -= GetPosition();
+//    printf("Current speed:\t%s\n", (currentSpeed).toString().c_str());
 }
 
 void KenazEngine::Player::Jump() {
-    currentSpeed.y = jumpForce;
+    if(collisionVector.y > 0 || jumpCount >= maxJumpCount) return;
+
+    speed.y -= jumpPhysics.InitialSpeed();
+//    printf("\tInitial speed: %f\n", jumpPhysics.InitialSpeed());
+//    printf("\tGravity: %f\n", jumpPhysics.Gravity());
 }
 
 // ==========
@@ -74,7 +93,9 @@ void KenazEngine::Player::AnalyzeCollisions(
         float otherRadius) {
     // Reset collision vector if there are no collisions
     // -------------------------------------------------
-    if(collisions.empty()) { collisionVector = Vector2(0); return; }
+    if(collisions.empty()) {
+        collisionVector = Vector2(0); landed = false; return;
+    }
 
     Vector2 position = GetPosition();
 
@@ -117,6 +138,11 @@ void KenazEngine::Player::AnalyzeCollisions(
     //if(dirMask.NW) printf("NW ");
     #pragma endregion
 
+    // Player landed
+    // -------------
+    if(dirMask.S && !landed) OnLanded();
+//    printf("Collision:\t%s\n", (collisionVector).toString().c_str());
+
     collisionVector = Vector2(0);
     if(dirMask.N) collisionVector.y += 1;
     if(dirMask.S) collisionVector.y -= 1;
@@ -132,3 +158,11 @@ void KenazEngine::Player::AnalyzeCollisions(
 
 Vector2 KenazEngine::Player::GetPosition() { return texture->GetPosition(); }
 float KenazEngine::Player::GetSize() { return texture->GetScale(); }
+
+void KenazEngine::Player::OnLanded() {
+    landed = true;
+//    printf("lmao\n\n\n\n\n");
+    speed.y = 0;
+    currentSpeed.y = 0;
+    jumpCount = 0;
+}

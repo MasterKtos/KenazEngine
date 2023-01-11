@@ -1,13 +1,10 @@
-#include <cmath>
 #include <iostream>
+#include <chrono>
 #include "SDL.h"
 #include "Engine/KenazEngine.h"
 #include "Engine/Map.h"
 #include "Engine/Vector2.h"
 #include "Engine/Player.h"
-#include "Engine/Overlay.h"
-#include "Scripts/Maze.h"
-#include "Scripts/Indicator.h"
 
 // Predeclarations
 // ---------------
@@ -50,15 +47,62 @@ int main(int argc, char *argv[]) {
     LoadMapTextures(Kenaz, map);
     map.LoadMap(std::string ("../../platformer.txt").c_str());
 
+    // Load background maps
+    // --------------------
+    KenazEngine::Texture *Cloud = Kenaz.CreateTexture();
+    Cloud->Load("layers/cloud.png");
+    KenazEngine::Texture *Wall = Kenaz.CreateTexture();
+    Wall->Load("layers/wall.png");
+    KenazEngine::Texture *Sky = Kenaz.CreateTexture();
+    Sky->Load("layers/sky.png");
+    KenazEngine::Texture *SkyGradient = Kenaz.CreateTexture();
+    SkyGradient->Load("layers/skyGradient.png");
+    KenazEngine::Texture *SkyDark = Kenaz.CreateTexture();
+    SkyDark->Load("layers/skyDark.png");
+    KenazEngine::Texture *Dirt = Kenaz.CreateTexture();
+    Dirt->Load("layers/dirt.png");
+    KenazEngine::Texture *DirtUp = Kenaz.CreateTexture();
+    DirtUp->Load("layers/dirtUp.png");
+
+    KenazEngine::Map mapBG1(tileSize);
+    {
+        mapBG1.LoadTile('v', Wall);
+        mapBG1.LoadMap(std::string("../../platformer_bg1.txt").c_str());
+    }
+    KenazEngine::Map mapBG2(tileSize);
+    {
+        mapBG2.LoadTile('h', DirtUp);
+        mapBG2.LoadTile('f', Dirt);
+        mapBG2.LoadMap(std::string("../../platformer_bg2.txt").c_str());
+    }
+    KenazEngine::Map mapBG3(tileSize);
+    {
+        mapBG3.LoadTile('f', Sky);
+        mapBG3.LoadTile('c', SkyGradient);
+        mapBG3.LoadTile('v', SkyDark);
+        mapBG3.LoadTile('h', Cloud);
+        mapBG3.LoadMap(std::string("../../platformer_bg3.txt").c_str());
+    }
+
     // Set up players on scene
     // -----------------------
-    playerTexture->MoveTo(7*tileSize, -2*tileSize);
+    playerTexture->MoveTo(15*tileSize, 35*tileSize);
 
     // Add gravity
     // -----------
-    player.speed.y = 9.81f;
+    //player.speed.y = 9.81f;
 
     SDL_Event event;
+
+    auto StartTime = std::chrono::high_resolution_clock::now();
+    auto FrameEndTime = StartTime;
+    std::chrono::duration<double> DeltaTime{};
+
+    int div1 = 1;
+    int div2 = 1;
+    int div3 = 1;
+
+
 
 
     for (int i=0;;i++) {
@@ -86,7 +130,7 @@ int main(int argc, char *argv[]) {
                     // -----
                     case SDLK_ESCAPE: return Kenaz.Quit(); break;
                 }
-                printf("KEYDOWN | ]%d[ \n", event.key.keysym.sym);
+                //printf("KEYDOWN | ]%d[ \n", event.key.keysym.sym);
             }
             if(event.type == SDL_KEYUP) {
                 switch(event.key.keysym.sym) {
@@ -97,6 +141,13 @@ int main(int argc, char *argv[]) {
                     //case SDLK_DOWN: player.speed.y = 0; break;
                     case SDLK_LEFT:
                     case SDLK_RIGHT: player.speed.x = 0; break;
+
+                    case SDLK_u: div1--; printf("DIV1: %d\n", div1); break;
+                    case SDLK_i: div1++; printf("DIV1: %d\n", div1); break;
+                    case SDLK_j: div2--; printf("DIV2: %d\n", div2); break;
+                    case SDLK_k: div2++; printf("DIV2: %d\n", div2); break;
+                    case SDLK_n: div3--; printf("DIV3: %d\n", div3); break;
+                    case SDLK_m: div3++; printf("DIV3: %d\n", div3); break;
                 }
                 //printf("KEYUP | %d \n", event.key.keysym.sym);
             }
@@ -105,6 +156,9 @@ int main(int argc, char *argv[]) {
 
         // Display stuff
         // -------------
+        mapBG3.Show();
+        mapBG2.Show();
+        mapBG1.Show();
         map.Show();
         player.Show();
 
@@ -117,14 +171,29 @@ int main(int argc, char *argv[]) {
 
         // Apply movement
         // --------------
-        player.Move();
+        player.Move(DeltaTime.count());
 
 
         // Move camera
         // -----------
-        auto middlePoint = player.GetPosition();
+        auto middlePoint = Vector2::Lerp(Kenaz.camera->Position, player.GetPosition(), 0.9f);
+
+            // Apply parallax effect
+            // ---------------------
+            auto posDelta = player.posDelta;
+//            printf("Delta:\t\t\t%s\n", posDelta.toStringf().c_str());
+
+
+
+            mapBG1.Move(posDelta.x/div1, -posDelta.y/div1);
+            mapBG2.Move(posDelta.x/div2, -posDelta.y/div2);
+            mapBG3.Move(posDelta.x/div3, -posDelta.y/div3);
 
         Kenaz.camera->MoveTo(middlePoint);
+
+        //Calculate timers
+        DeltaTime = std::chrono::high_resolution_clock::now() - FrameEndTime;
+        FrameEndTime = std::chrono::high_resolution_clock::now();
     }
 
     SDL_Quit();
