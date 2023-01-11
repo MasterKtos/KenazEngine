@@ -13,7 +13,7 @@
 namespace KenazEngine {
     KenazEngine::KenazEngine() {
         Resolution = std::make_shared<std::pair<uint16_t, uint16_t>>(640, 480);
-        Framerate = 60;
+        Framerate = 120;
     }
 
     #pragma region INITIALIZATION
@@ -89,9 +89,9 @@ namespace KenazEngine {
     }
     #pragma endregion
 
-    int KenazEngine::UpdateBegin() {
+    int KenazEngine::UpdateBegin(float deltaTime) {
         SDL_RenderPresent(Renderer);
-        SDL_Delay(1000/Framerate);
+        SDL_Delay((1000 - deltaTime*1000)/Framerate);
         SDL_RenderClear(Renderer);
         SDL_RenderCopy(Renderer, Background, nullptr, nullptr);
 

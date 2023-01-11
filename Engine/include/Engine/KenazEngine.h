@@ -47,7 +47,7 @@ namespace KenazEngine {
         bool SetBackgroundColor(int r, int g, int b);
 
         bool Start();
-        int UpdateBegin();
+        int UpdateBegin(float deltaTime);
         int Quit();
 
         Texture* CreateTexture();

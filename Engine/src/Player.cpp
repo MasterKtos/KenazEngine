@@ -18,9 +18,10 @@ void KenazEngine::Player::Move(float deltaTime) {
     if(!texture) return;
 
     posDelta = GetPosition();
+    jumpPhysics.deltaTime = deltaTime;
 
-    // Player landed
-    // -------------
+    // Player not on ground
+    // --------------------
     if(collisionVector.y >= 0) {
         speed.y -= jumpPhysics.Gravity() * deltaTime;
     }
@@ -32,7 +33,7 @@ void KenazEngine::Player::Move(float deltaTime) {
     }
 
     texture->Move(currentSpeed + currentSpeed*collisionVector);
-    currentSpeed.y += speed.y * deltaTime + jumpPhysics.GetPositionChange(deltaTime);
+    currentSpeed.y += speed.y * deltaTime + jumpPhysics.GetPositionChange();
 
 //    printf("Speed:\t\t\t%s\n", (speed).toString().c_str());
     posDelta -= GetPosition();
@@ -83,9 +84,9 @@ void KenazEngine::Player::OnBoxCollide(Vector2 pos, float otherRadius) {
 
     // Reflection
     // ----------
-    collisionVector += normalVector;
-    collisionVector.Mask(normalVector);
-    collisionVector.Clamp(1);
+    //collisionVector += normalVector;
+    //collisionVector.Mask(normalVector);
+    //collisionVector.Clamp(1);
 }
 
 void KenazEngine::Player::AnalyzeCollisions(
@@ -107,10 +108,10 @@ void KenazEngine::Player::AnalyzeCollisions(
         Vector2 diff = position - collision;
         // printf("%f %s\t", regionSize, diff.toString().c_str());
 
-        // =================================
-        // BELOW IS OBSOLETE
-        // Now it only divides to N, E, S, W
-        // =================================
+        // ==========================================
+        //              BELOW IS OBSOLETE
+        //      Now it only divides to N, E, S, W
+        // ==========================================
         // Division looks like such:
         //
         //  NW \ N / NE  } regionSize/2
@@ -118,13 +119,38 @@ void KenazEngine::Player::AnalyzeCollisions(
         //  SW / S \ SE  } regionSize/2
 
         // N
-        if     (diff.y > 0 && abs(diff.y)+5 >= abs(diff.x)) dirMask.N = true;
+        if(diff.y > 0 && abs(diff.y)+5 >= abs(diff.x)) {
+            // First collision detected in that direction
+            //if(!dirMask.N && collisionVector.y < 0)
+            //    texture->Move(0, -diff.y + GetSize()/2 + otherRadius);
+            dirMask.N = true;
+            if(abs(diff.y) < GetSize()/2 + otherRadius)
+                texture->Move(0, -(diff.y + GetSize()/2 + otherRadius));
+        }
         // S
-        else if(diff.y < 0 && abs(diff.y)+5 >= abs(diff.x)) dirMask.S = true;
+        else if(diff.y < 0 && abs(diff.y)+5 >= abs(diff.x)) {
+            //if(!dirMask.S && collisionVector.y > 0)
+            //    texture->Move(0, -diff.y - GetSize()/2 - otherRadius);
+            dirMask.S = true;
+            if(abs(diff.y) < GetSize()/2 + otherRadius)
+                texture->Move(0, -(diff.y + GetSize()/2 + otherRadius));
+        }
         // E/W
         else {
-            if(diff.x > 0) dirMask.W = true;
-            else           dirMask.E = true;
+            if(diff.x > 0) {
+                //if(!dirMask.W && collisionVector.x < 0)
+                //    texture->Move( -diff.y - GetSize()/2 - otherRadius, 0);
+                dirMask.W = true;
+                if(abs(diff.x) < GetSize()/2 + otherRadius)
+                    texture->Move(-(diff.x + GetSize()/2 + otherRadius), 0);
+            }
+            else {
+                //if(!dirMask.E && collisionVector.x > 0)
+                //    texture->Move( -diff.y - GetSize()/2 - otherRadius, 0);
+                dirMask.E = true;
+                if(abs(diff.x) < GetSize()/2 + otherRadius)
+                    texture->Move(-(diff.x + GetSize()/2 + otherRadius), 0);
+            }
         }
     }
     #pragma region  Mask print
@@ -136,12 +162,14 @@ void KenazEngine::Player::AnalyzeCollisions(
     //if(dirMask.SW) printf("SW ");
     //if(dirMask.W)  printf("W ");
     //if(dirMask.NW) printf("NW ");
+    //printf("\n");
     #pragma endregion
 
     // Player landed
     // -------------
     if(dirMask.S && !landed) OnLanded();
-//    printf("Collision:\t%s\n", (collisionVector).toString().c_str());
+    if(dirMask.N && currentSpeed.y < 0) {
+        speed.y = 0; currentSpeed.y = 0; }
 
     collisionVector = Vector2(0);
     if(dirMask.N) collisionVector.y += 1;

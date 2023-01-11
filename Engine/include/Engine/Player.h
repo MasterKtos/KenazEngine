@@ -12,11 +12,12 @@ class JumpPhysics {
 public:
     float height;
     float timeToMax;
+    float deltaTime;
 
-    JumpPhysics() : height(5), timeToMax(0.5f) {}
-    float Gravity() { return -2*height/(timeToMax*timeToMax); }
+    JumpPhysics() : height(1), timeToMax(2), deltaTime(0) {}
+    float Gravity() { return -2*height/(timeToMax*timeToMax) * deltaTime; }
     float InitialSpeed() { return 2*height/timeToMax; }
-    float GetPositionChange(float deltaTime) {
+    float GetPositionChange() {
         return 0.5f * Gravity() * deltaTime * deltaTime;
     }
 };
