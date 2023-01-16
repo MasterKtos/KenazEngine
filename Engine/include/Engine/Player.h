@@ -7,20 +7,7 @@
 
 #include "Vector2.h"
 #include "Texture.h"
-
-class JumpPhysics {
-public:
-    float height;
-    float timeToMax;
-    float deltaTime;
-
-    JumpPhysics() : height(100), timeToMax(0.5), deltaTime(0) {}
-    float Gravity() { return -2*height/(timeToMax*timeToMax) * deltaTime; }
-    float InitialSpeed() { return 2*height/timeToMax; }
-    float GetPositionChange() {
-        return 0.5f * Gravity() * deltaTime * deltaTime;
-    }
-};
+#include "JumpPhysics.h"
 
 enum class Direction {
     N, NE, E, SE,
@@ -40,7 +27,6 @@ namespace KenazEngine {
         Texture* texture;
 
         Vector2 collisionVector;
-        int jumpCount;
 
         void OnLanded();
 
@@ -51,7 +37,6 @@ namespace KenazEngine {
         bool applyGravity;
         bool landed = false;
         JumpPhysics jumpPhysics;
-        int maxJumpCount;
         ///\note
         /// Value range: \<0, 1>  0 - max lerp, 1 - no lerp
         float speedLerp;

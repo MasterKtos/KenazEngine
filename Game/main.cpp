@@ -102,14 +102,17 @@ int main(int argc, char *argv[]) {
     int div2 = 1;
     int div3 = 1;
 
-
-
+    const Uint8* state = SDL_GetKeyboardState(nullptr);
 
     for (int i=0;;i++) {
         Kenaz.UpdateBegin(DeltaTime.count());
 
         // Process input
         // -------------
+        if (state[SDL_SCANCODE_SPACE]) {
+            player.Jump();
+        }
+
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                 return Kenaz.Quit();
