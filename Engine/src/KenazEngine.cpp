@@ -91,7 +91,9 @@ namespace KenazEngine {
 
     int KenazEngine::UpdateBegin(float deltaTime) {
         SDL_RenderPresent(Renderer);
-        SDL_Delay((1000 - deltaTime*1000)/Framerate);
+        if (deltaTime < 0.016) {
+            SDL_Delay(16 - deltaTime * 1000);
+        }
         SDL_RenderClear(Renderer);
         SDL_RenderCopy(Renderer, Background, nullptr, nullptr);
 

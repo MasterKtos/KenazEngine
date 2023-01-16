@@ -23,17 +23,19 @@ void KenazEngine::Player::Move(float deltaTime) {
     // Player not on ground
     // --------------------
     if(collisionVector.y >= 0) {
-        speed.y -= jumpPhysics.Gravity() * deltaTime;
+        speed.y -= jumpPhysics.Gravity();
     }
 
     // Lerp only x speed
     // -----------------
     if(speed.x != currentSpeed.x) {
-        currentSpeed = Vector2::Lerp(currentSpeed, Vector2(speed.x, currentSpeed.y), speedLerp);
+        currentSpeed = Vector2::Lerp(currentSpeed,
+                                     Vector2(speed.x, currentSpeed.y),
+                                     speedLerp);
     }
 
     texture->Move(currentSpeed + currentSpeed*collisionVector);
-    currentSpeed.y += speed.y * deltaTime + jumpPhysics.GetPositionChange();
+    currentSpeed.y = speed.y * deltaTime + jumpPhysics.GetPositionChange();
 
 //    printf("Speed:\t\t\t%s\n", (speed).toString().c_str());
     posDelta -= GetPosition();
@@ -42,6 +44,7 @@ void KenazEngine::Player::Move(float deltaTime) {
 
 void KenazEngine::Player::Jump() {
     if(collisionVector.y > 0 || jumpCount >= maxJumpCount) return;
+    jumpCount++;
 
     speed.y -= jumpPhysics.InitialSpeed();
 //    printf("\tInitial speed: %f\n", jumpPhysics.InitialSpeed());

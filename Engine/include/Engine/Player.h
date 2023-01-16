@@ -14,7 +14,7 @@ public:
     float timeToMax;
     float deltaTime;
 
-    JumpPhysics() : height(1), timeToMax(2), deltaTime(0) {}
+    JumpPhysics() : height(100), timeToMax(0.5), deltaTime(0) {}
     float Gravity() { return -2*height/(timeToMax*timeToMax) * deltaTime; }
     float InitialSpeed() { return 2*height/timeToMax; }
     float GetPositionChange() {
