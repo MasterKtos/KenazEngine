@@ -12,7 +12,7 @@ int LoadMapTextures(KenazEngine::KenazEngine Kenaz,
                     KenazEngine::Map &map);
 
 int main(int argc, char *argv[]) {
-    Vector2 screenSize(1366, 768);
+    Vector2 screenSize(800, 600);
     Vector2 screenCentre(screenSize.x/2, screenSize.y/2);
     int tileSize = 32;
 

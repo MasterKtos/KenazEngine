@@ -9,7 +9,7 @@
 KenazEngine::Player::Player()
         : currentSpeed(0), speed(0), speedLerp(1) {
 
-    jumpPhysics.isControlledJump = true;
+//    jumpPhysics.isControlledJump = true;
 //    jumpPhysics.isFastFalling = true;
 }
 
@@ -21,15 +21,16 @@ void KenazEngine::Player::Move(float deltaTime) {
     if(!texture) return;
 
     posDelta = GetPosition();
-    // Update jump physics parameters
-    jumpPhysics.deltaTime = deltaTime;
-    jumpPhysics.currentSpeedY = -currentSpeed.y;
 
     // Player not on ground
     // --------------------
     if(collisionVector.y >= 0) {
         speed.y -= jumpPhysics.GetGravity();
     }
+
+    // Update jump physics parameters
+    jumpPhysics.deltaTime = deltaTime;
+    jumpPhysics.currentSpeedY = -speed.y;
 
     // Lerp only x speed
     // -----------------
@@ -42,7 +43,7 @@ void KenazEngine::Player::Move(float deltaTime) {
     texture->Move(currentSpeed + currentSpeed*collisionVector);
     currentSpeed.y = speed.y * deltaTime + jumpPhysics.GetPositionChange();
 
-//    printf("Speed:\t\t\t%s\n", (speed).toString().c_str());
+//    printf("Speed:\t\t\t%s\n", (speed).toStringf().c_str());
     posDelta -= GetPosition();
 //    printf("Current speed:\t%s\n", (currentSpeed).toStringf().c_str());
 }
@@ -198,5 +199,6 @@ void KenazEngine::Player::OnLanded() {
 //    printf("lmao\n\n\n\n\n");
     speed.y = 0;
     currentSpeed.y = 0;
-    jumpPhysics.jumpCount = 0;
+
+    jumpPhysics.Reset();
 }
