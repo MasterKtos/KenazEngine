@@ -12,6 +12,7 @@
 #include "Camera.h"
 #include "Overlay.h"
 #include "../../../Game/Scripts/Indicator.h"
+#include "../../../Game/Scripts/IconsUI.h"
 
 namespace KenazEngine {
 
@@ -53,6 +54,7 @@ namespace KenazEngine {
         Texture* CreateTexture();
         std::shared_ptr<Overlay> CreateOverlay();
         std::shared_ptr<Indicator> CreateIndicator();
+        std::shared_ptr<IconsUI> CreateIcon();
     };
 
 }

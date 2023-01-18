@@ -35,7 +35,7 @@ public:
     int controlledJumpSteps = 20;
 
 
-    JumpPhysics() : height(100), timeToMax(0.4), deltaTime(0) {}
+    JumpPhysics() : height(50), timeToMax(0.4), deltaTime(0) {}
 
     float GetGravity() {
         if(isFastFalling && currentSpeedY < 0) {
@@ -54,7 +54,6 @@ public:
         else if(fullJumpCount < maxFullJumpCount &&
                 currentSpeedY < 0) {
             fullJumpCount++;
-            printf("siema\n\n\n");
             return InitialSpeed() - currentSpeedY;
         }
         return 0;

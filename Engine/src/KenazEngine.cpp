@@ -4,6 +4,7 @@
 
 #include "Engine/KenazEngine.h"
 #include "Engine/Overlay.h"
+#include "../../Game/Scripts/IconsUI.h"
 
 #include <memory>
 #include <utility>
@@ -119,5 +120,8 @@ namespace KenazEngine {
 
     std::shared_ptr<Indicator> KenazEngine::CreateIndicator() {
         return std::make_shared<Indicator>(Renderer, camera);
+    }
+    std::shared_ptr<IconsUI> KenazEngine::CreateIcon() {
+        return std::make_shared<IconsUI>(Renderer, camera);
     }
 }

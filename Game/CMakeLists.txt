@@ -15,7 +15,7 @@ add_executable(${PROJECT_NAME} main.cpp
 #        Scenes/game.cpp
 #        Scenes/balls_bouncing.cpp
 #        Scenes/maze_level.cpp
-        )
+        Scripts/src/IconsUI.cpp Scripts/IconsUI.h)
 
 
 # Link the static library from subproject1 using its alias sub::lib1

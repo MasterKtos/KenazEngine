@@ -5,6 +5,7 @@
 #include "Engine/Map.h"
 #include "Engine/Vector2.h"
 #include "Engine/Player.h"
+#include "Scripts/IconsUI.h"
 
 // Predeclarations
 // ---------------
@@ -26,17 +27,18 @@ int main(int argc, char *argv[]) {
     if(!Kenaz.Start()) return 1;
 
     // Load icons
-    KenazEngine::Texture* iconFastFalling = Kenaz.CreateTexture();
+    // ----------
+    std::shared_ptr<IconsUI> iconFastFalling = Kenaz.CreateIcon();
     iconFastFalling->Load("icons/fastFall.png");
     iconFastFalling->MoveTo(tileSize/2, tileSize/2);
     iconFastFalling->Resize(tileSize, tileSize);
 
-    KenazEngine::Texture* iconDoubleJump = Kenaz.CreateTexture();
+    std::shared_ptr<IconsUI> iconDoubleJump = Kenaz.CreateIcon();
     iconDoubleJump->Load("icons/doubleJump.png");
     iconDoubleJump->MoveTo(tileSize/2, tileSize/2 + tileSize);
     iconDoubleJump->Resize(tileSize, tileSize);
 
-    KenazEngine::Texture* iconControlledJump = Kenaz.CreateTexture();
+    std::shared_ptr<IconsUI> iconControlledJump = Kenaz.CreateIcon();
     iconControlledJump->Load("icons/controlledJump.png");
     iconControlledJump->MoveTo(tileSize/2, tileSize/2 + 2*tileSize);
     iconControlledJump->Resize(tileSize, tileSize);
@@ -166,12 +168,12 @@ int main(int argc, char *argv[]) {
                     case SDLK_2: player.jumpPhysics.isControlledJump = !player.jumpPhysics.isControlledJump; break;
                     case SDLK_3: player.jumpPhysics.maxFullJumpCount = player.jumpPhysics.maxFullJumpCount==1?2:1; break;
 
-                    case SDLK_u: div1-=divStep; printf("DIV1: %d\n", div1); break;
-                    case SDLK_i: div1+=divStep; printf("DIV1: %d\n", div1); break;
-                    case SDLK_j: div2-=divStep; printf("DIV2: %d\n", div2); break;
-                    case SDLK_k: div2+=divStep; printf("DIV2: %d\n", div2); break;
-                    case SDLK_n: div3-=divStep; printf("DIV3: %d\n", div3); break;
-                    case SDLK_m: div3+=divStep; printf("DIV3: %d\n", div3); break;
+                    case SDLK_u: div1-=divStep; printf("DIV1: %f\n", div1); break;
+                    case SDLK_i: div1+=divStep; printf("DIV1: %f\n", div1); break;
+                    case SDLK_j: div2-=divStep; printf("DIV2: %f\n", div2); break;
+                    case SDLK_k: div2+=divStep; printf("DIV2: %f\n", div2); break;
+                    case SDLK_n: div3-=divStep; printf("DIV3: %f\n", div3); break;
+                    case SDLK_m: div3+=divStep; printf("DIV3: %f\n", div3); break;
                 }
                 //printf("KEYUP | %d \n", event.key.keysym.sym);
             }
@@ -188,9 +190,9 @@ int main(int argc, char *argv[]) {
 
         // Show info to user
         // -----------------
-        if(player.jumpPhysics.isFastFalling) {printf("lmao"); iconFastFalling->Show(); }
-        if(player.jumpPhysics.isControlledJump) {printf("lmao"); iconControlledJump->Show(); }
-        if(player.jumpPhysics.maxFullJumpCount > 1) {printf("lmao"); iconDoubleJump->Show(); }
+        if(player.jumpPhysics.isFastFalling) iconFastFalling->Show();
+        if(player.jumpPhysics.isControlledJump) iconControlledJump->Show();
+        if(player.jumpPhysics.maxFullJumpCount > 1) iconDoubleJump->Show();
 
         // Check collisions
         // ----------------
