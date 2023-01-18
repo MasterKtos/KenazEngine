@@ -25,6 +25,22 @@ int main(int argc, char *argv[]) {
 
     if(!Kenaz.Start()) return 1;
 
+    // Load icons
+    KenazEngine::Texture* iconFastFalling = Kenaz.CreateTexture();
+    iconFastFalling->Load("icons/fastFall.png");
+    iconFastFalling->MoveTo(tileSize/2, tileSize/2);
+    iconFastFalling->Resize(tileSize, tileSize);
+
+    KenazEngine::Texture* iconDoubleJump = Kenaz.CreateTexture();
+    iconDoubleJump->Load("icons/doubleJump.png");
+    iconDoubleJump->MoveTo(tileSize/2, tileSize/2 + tileSize);
+    iconDoubleJump->Resize(tileSize, tileSize);
+
+    KenazEngine::Texture* iconControlledJump = Kenaz.CreateTexture();
+    iconControlledJump->Load("icons/controlledJump.png");
+    iconControlledJump->MoveTo(tileSize/2, tileSize/2 + 2*tileSize);
+    iconControlledJump->Resize(tileSize, tileSize);
+
     // Load textures
     // -------------
     KenazEngine::Texture* playerTexture = Kenaz.CreateTexture();
@@ -98,9 +114,10 @@ int main(int argc, char *argv[]) {
     auto FrameEndTime = StartTime;
     std::chrono::duration<double> DeltaTime{};
 
-    int div1 = 1;
-    int div2 = 1;
-    int div3 = 1;
+    float div1 = 1;
+    float div2 = 1;
+    float div3 = 1;
+    float divStep = 0.1;
 
     const Uint8* state = SDL_GetKeyboardState(nullptr);
 
@@ -145,12 +162,16 @@ int main(int argc, char *argv[]) {
                     case SDLK_LEFT:
                     case SDLK_RIGHT: player.speed.x = 0; break;
 
-                    case SDLK_u: div1--; printf("DIV1: %d\n", div1); break;
-                    case SDLK_i: div1++; printf("DIV1: %d\n", div1); break;
-                    case SDLK_j: div2--; printf("DIV2: %d\n", div2); break;
-                    case SDLK_k: div2++; printf("DIV2: %d\n", div2); break;
-                    case SDLK_n: div3--; printf("DIV3: %d\n", div3); break;
-                    case SDLK_m: div3++; printf("DIV3: %d\n", div3); break;
+                    case SDLK_1: player.jumpPhysics.isFastFalling = !player.jumpPhysics.isFastFalling; break;
+                    case SDLK_2: player.jumpPhysics.isControlledJump = !player.jumpPhysics.isControlledJump; break;
+                    case SDLK_3: player.jumpPhysics.maxFullJumpCount = player.jumpPhysics.maxFullJumpCount==1?2:1; break;
+
+                    case SDLK_u: div1-=divStep; printf("DIV1: %d\n", div1); break;
+                    case SDLK_i: div1+=divStep; printf("DIV1: %d\n", div1); break;
+                    case SDLK_j: div2-=divStep; printf("DIV2: %d\n", div2); break;
+                    case SDLK_k: div2+=divStep; printf("DIV2: %d\n", div2); break;
+                    case SDLK_n: div3-=divStep; printf("DIV3: %d\n", div3); break;
+                    case SDLK_m: div3+=divStep; printf("DIV3: %d\n", div3); break;
                 }
                 //printf("KEYUP | %d \n", event.key.keysym.sym);
             }
@@ -164,6 +185,12 @@ int main(int argc, char *argv[]) {
         mapBG1.Show();
         map.Show();
         player.Show();
+
+        // Show info to user
+        // -----------------
+        if(player.jumpPhysics.isFastFalling) {printf("lmao"); iconFastFalling->Show(); }
+        if(player.jumpPhysics.isControlledJump) {printf("lmao"); iconControlledJump->Show(); }
+        if(player.jumpPhysics.maxFullJumpCount > 1) {printf("lmao"); iconDoubleJump->Show(); }
 
         // Check collisions
         // ----------------

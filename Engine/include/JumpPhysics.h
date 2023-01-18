@@ -28,7 +28,7 @@ public:
     float fastFallingMultiplier = 2;
 
     // Double Jump
-    int maxFullJumpCount = 3;
+    int maxFullJumpCount = 1;
 
     // Controlled jump
     bool isControlledJump = false;

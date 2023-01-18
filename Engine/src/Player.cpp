@@ -7,11 +7,7 @@
 #include "Engine/Player.h"
 
 KenazEngine::Player::Player()
-        : currentSpeed(0), speed(0), speedLerp(1) {
-
-//    jumpPhysics.isControlledJump = true;
-//    jumpPhysics.isFastFalling = true;
-}
+        : currentSpeed(0), speed(0), speedLerp(1) {}
 
 void KenazEngine::Player::SetTexture(Texture* newTexture) { texture = newTexture; }
 
